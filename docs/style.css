@@ -1,32 +1,19 @@
-/* html, body {
-  height: 100%;
-  width: 100%;
-} */
-
-body {
-   text-align: center;
-  background: purple url("smiley.png") 50px/50px; 
+nav{
+  border: 1px solid grey;
+  border-radius: 5px;
+  margin-top: 5px;
 }
 
-h1, p {
-    color: blueviolet;
+.home{
+  font-size: 18px !important;
 }
 
-h1 {
-    font-size: 4rem;
-    padding-top: 10rem;
+.flex-cards{
+  display:flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.bigger-text {
-  font-size: 1.5rem;
-}
-
-body {
-  background-color:black;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  height: 800px;
-  width: 800px;
-  margin: auto;
+.template{
+  display: none !important;
 }
