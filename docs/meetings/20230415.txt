@@ -1,0 +1,4 @@
+We have some kinect skeleton tracking code but not sure if it works yet
+
+Dana: work on arduino code:
+	https://github.com/stm32duino/X-NUCLEO-IHM01A1
