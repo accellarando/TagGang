@@ -2,3 +2,14 @@ We have some kinect skeleton tracking code but not sure if it works yet
 
 Dana: work on arduino code:
 	https://github.com/stm32duino/X-NUCLEO-IHM01A1
+1. Simple program that accepts stepper motor commands from the command line and sends them to arduino
+2. Once we have that, we can call that program from the kinect code to control the stepper motor
+
+Overview of final interface:
+E Kinect will send information to computer
+E Computer translates that information to a stepper motor command, e.g. "-3" or "24"
+R Then, this program calls a script to send the stepper motor command to the arduino over serial:
+	./stepper_control.py -3
+R The Arduino picks up this serial command
+R Arduino sends serial command to stepper driver
+R Stepper motor moves to desired position
