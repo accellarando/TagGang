@@ -30,20 +30,39 @@
 		<div class="container">
 			<h1>Stepper Motor and Driver</h1>
 
+			<h2>References</h2>
+			<ul>
+                <li>
+					Datasheets 
+					<ul>
+						<li>[1] <a href="https://nz.mouser.com/datasheet/2/471/SANMOTION_F2_E-1648671.pdf">Sanmotion 2-Phase Stepping Systems F2</a></li>
+						<li>[2] <a href="https://www.st.com/resource/en/user_manual/um1926-getting-started-with-the-xnucleoihm05a1-l6208based-bipolar-stepper-motor-driver-expansion-board-for-stm32-nucleo-stmicroelectronics.pdf">
+							X-NUCLEO-IHM05A1 User Manual UM1926</a></li>
+					</ul>
+					TEXT (OUTSIDE OF BULLET)
+				</li>
+			</ul>
+
             
 			<h2>Preliminary Information</h2>
 			<ul>
 				<li>
 					<strong>2-Phase Bipolar Stepper Motor -> SF2424-10B11</strong>
 					<ul>
-						<li>BULLET</li>					</ul>
+						<li>BULLET</li>					
+					</ul>
 					TEXT (OUTSIDE OF BULLET)
 				</li>
 
                 <li>
 					<strong>Bipolar Stepper Motor Driver Board ->  X-NUCLEO-IHM05A1</strong>
 					<ul>
-						<li>BULLET</li>
+						<li> .ino without use of library 
+							<a href="https://github.com/stm32duino/X-NUCLEO-IHM05A1">Github repo stm32duino/X-NUCLEO-IHM05A1</a>
+						</li>
+						<li> Board seen as a disk drive</li>
+						<li> AWG22 for power supply (2m max.) [1, pg. 30 "External wiring digram"]</li>
+						<li> Stepper motor connector 4-wire (4835775-1)</li>
 					</ul>
 					TEXT (OUTSIDE OF BULLET)
 				</li>
