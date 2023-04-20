@@ -28,45 +28,87 @@
 		</nav>
 
 		<div class="container">
-			<h1>Stepper Motor and Driver Notes</h1>
+			<h1>Stepper Motor and Driver</h1>
 
+            
 			<h2>Preliminary Information</h2>
 			<ul>
 				<li>
-					TOPIC 1:
+					<strong>2-Phase Bipolar Stepper Motor -> SF2424-10B11</strong>
+					<ul>
+						<li>BULLET</li>					</ul>
+					TEXT (OUTSIDE OF BULLET)
+				</li>
+
+                <li>
+					<strong>Bipolar Stepper Motor Driver Board ->  X-NUCLEO-IHM05A1</strong>
 					<ul>
 						<li>BULLET</li>
-						<li>BULLET TEXT <a href="https://github.com/OpenKinect/libfreenect">LINK</a> END TEXT</li>
+					</ul>
+					TEXT (OUTSIDE OF BULLET)
+				</li>
+			</ul>
+
+
+            <h2>Programming</h2>
+			<ul>
+                <li>
+					Python - serialMotorCMD.py 
+					<ul>
+						<li>BULLET</li>
 					</ul>
 					TEXT (OUTSIDE OF BULLET)
 				</li>
 
-				<li>
-                    <strong>TO DO </strong>(before next meeting):
-                    <ul>
-                        <li>Dana -> Get Kinect sensor on 2023-04-04/Saturday</li>
-                    </ul>
-				</li>
-			</ul>
-
-            <h2>Programming</h2>
-			<ul>
 				<li>
 					Arduino - serialMotorDriver.ino
 					<ul>
 						<li>BULLET</li>
-						<li>BULLET TEXT <a href="https://github.com/OpenKinect/libfreenect">LINK</a> END TEXT</li>
 					</ul>
 					TEXT (OUTSIDE OF BULLET)
 				</li>
 
-				<li>
-					Python - serialMotorCMD.py 
+                <li>
+                    Libraries:
+                    <ul>
+                        <li>Arudino - <a href="https://www.arduino.cc/reference/en/libraries/stepper/">Stepper library</a> documentation 
+                            provided by Arudino in controlling bipolar stepper motors
+                            <ul>
+                                <li>SUBBULLET</li>
+                            </ul>
+                        </li>
+                        
+                        <li>Arudino - <a href="https://www.airspayce.com/mikem/arduino/AccelStepper/">AccelStepper library</a> documentation 
+                            provided by third-party developers in additional improvements to the Arudino's Stepper Library 
+                            <ul>
+                                <li><a href="https://www.airspayce.com/mikem/arduino/AccelStepper/classMultiStepper.html">MultiStepper class</a> for 
+                                    more than 2 stepper motors movement control
+                                </li>
+                            </ul>
+                        </li>
+                        
+                    </ul>
+                    TEXT (OUTSIDE OF BULLET)
+                </li>
+    
+                <li>
+                    Serial Communication
+                    <ul>
+                        <li>BULLET</li>
+                        <li>BULLET TEXT <a href="https://www.hackster.io/ansh2919/serial-communication-between-python-and-arduino-e7cce0">LINK</a> END TEXT</li>
+                    </ul>
+                    TEXT (OUTSIDE OF BULLET)
+                </li>
+            </ul>
+            
+
+            <h2>Progress</h2>
+            <ul>
+                <li>
+					<strong>Next Tasks:</strong>
 					<ul>
-						<li>BULLET</li>
-						<li>BULLET TEXT <a href="https://github.com/OpenKinect/libfreenect">LINK</a> END TEXT</li>
+						<li>Need 24VDC power supply adaptor for stepper motor</li>
 					</ul>
-					TEXT (OUTSIDE OF BULLET)
 				</li>
             </ul>
 
