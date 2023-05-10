@@ -1,0 +1,9 @@
+[01] https://www.raspberrypi.com/news/production-and-supply-chain-update/
+
+[02] P. Spencer, “Achievement unlocked: 10 Years – thank you, xbox 360,” Xbox Wire, 20-Apr-2016. [Online]. Available: https://news.xbox.com/en-us/2016/04/20/xbox-360-celebrating-10-years/. [Accessed: 13-Apr-2023]. 
+
+[03] Hickeys, “Kinect for Windows - Windows Apps,” Windows apps | Microsoft Learn. [Online]. Available: https://learn.microsoft.com/en-us/windows/apps/design/devices/kinect-for-windows. [Accessed: 14-Apr-2023]. 
+
+** 3992_PrototypeProposal - kinect info
+
+There are features in TagGang's Kinect not found in the libfreenect SDK base build that we would like to explore further through the means of other SDK integrations like finger/palm detection.
