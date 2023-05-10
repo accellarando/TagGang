@@ -16,3 +16,13 @@
 There are features in TagGang's Kinect not found in the libfreenect SDK base build that we would like to explore further through the means of other SDK integrations like finger/palm detection.
 
 https://gmv.cast.uark.edu/scanning/hardware/microsoft-kinect-resourceshardware/
+
+- Penelope: Vertical plotter, 3D printed materials 
+https://davidbliss.com/2021/09/13/penelope/
+
+--- TO DO
+
+- FSM DIAGRAM
+- BLOCK DIAGRAM
+- DEMO PIC
+- PLOTTER
