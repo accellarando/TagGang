@@ -4,6 +4,15 @@
 
 [03] Hickeys, “Kinect for Windows - Windows Apps,” Windows apps | Microsoft Learn. [Online]. Available: https://learn.microsoft.com/en-us/windows/apps/design/devices/kinect-for-windows. [Accessed: 14-Apr-2023]. 
 
-** 3992_PrototypeProposal - kinect info
+[04] G. Chen, S. Baek, J.-D. Florez, W. Qian, S.-W. Leigh, S. Hutchinson, and F. Dellaert, “GTGraffiti: Spray painting graffiti art from human painting motions with a cable driven parallel robot,” in 2022 IEEE International Conference on Robotics and Automation (ICRA), 2022. [Online]. Available: https://research.gatech.edu/introducing-gtgraffiti-robot-paints-human. [Accessed: 25-Apr-2023].
+
+[05] J. Lehni, U. Franke. "Hektor" juerglehni. [Online]. Available: https://juerglehni.com/works/hektor. [Accessed: 24-Apr-2023].
+
+
+- (3992_PrototypeProposal) kinect info
+
+- (3992_PrototypeReflection) further research -> telematic art (telegarden)
 
 There are features in TagGang's Kinect not found in the libfreenect SDK base build that we would like to explore further through the means of other SDK integrations like finger/palm detection.
+
+https://gmv.cast.uark.edu/scanning/hardware/microsoft-kinect-resourceshardware/
