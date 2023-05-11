@@ -8,6 +8,10 @@
 
 [05] J. Lehni, U. Franke. "Hektor" juerglehni. [Online]. Available: https://juerglehni.com/works/hektor. [Accessed: 24-Apr-2023].
 
+[06] https://davidbliss.com/2021/09/13/penelope/
+
+[07] https://www.thingiverse.com/thing:2371117
+
 
 - (3992_PrototypeProposal) kinect info
 
@@ -17,10 +21,17 @@ There are features in TagGang's Kinect not found in the libfreenect SDK base bui
 
 https://gmv.cast.uark.edu/scanning/hardware/microsoft-kinect-resourceshardware/
 
-- Penelope: Vertical plotter, 3D printed materials 
-https://davidbliss.com/2021/09/13/penelope/
+https://www.instructables.com/Polargraph-Drawing-Machine/
 
 --- TO DO
+
+CHANGE PEN PLOTTER TO PAINT-PEN PLOTTER
+
+    % FIXME: The Kinect v2 face recognition, motion tracking, and resolution are much more precise than the Kinect v1
+    % FIXME: No finger tracking
+    % FIXME: DIFFERENT GESTURES -  Draw/move without drawing: hold out hand in front of you while drawing, pull back to stop? As a backup, if that doesn't work - hide your left hand to stop drawing Finish - button on lower right corner of screen? Punch with left hand? or a timer
+    % FIXME: NOISE FROM GESTURE
+    % FIXME: FAST ENOUGH MOVEMENT
 
 - FSM DIAGRAM
 - BLOCK DIAGRAM
