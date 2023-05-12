@@ -12,6 +12,17 @@
 
 [07] https://www.thingiverse.com/thing:2371117
 
+[08] Chen, J. Microsoft Xbox 360 Kinect launches November 4. Gizmodo, 14-Jun-2010. from https://gizmodo.com/microsoft-xbox-360-kinect-launches-november-4-5563148 [Accessed: 13-Apr-2023]
+
+[09] “Connect the sensor to the original Console - microsoft xbox 360 Kinect Manual \& Warranty [page 8],” ManualsLib, 23-Mar-2019. [Online]. Available: https://www.manualslib.com/manual/1541058/Microsoft-Xbox-360-Kinect.html?page=8\#manual. [Accessed: 13-Apr-2023]. 
+
+[010] P. Spencer, “Achievement unlocked: 10 Years – thank you, xbox 360,” Xbox Wire, 20-Apr-2016. [Online]. Available: https://news.xbox.com/en-us/2016/04/20/xbox-360-celebrating-10-years/. [Accessed: 13-Apr-2023]. 
+
+[011] Hickeys, “Kinect for Windows - Windows Apps,” Windows apps | Microsoft Learn. [Online]. Available: https://learn.microsoft.com/en-us/windows/apps/design/devices/kinect-for-windows. [Accessed: 14-Apr-2023]. 
+
+[012] OpenKinect, “OpenKinect/libfreenect: Drivers and libraries for the Xbox Kinect device on windows, linux, and OS X,” GitHub. [Online]. Available: https://github.com/OpenKinect/libfreenect. [Accessed: 24-Apr-2023].
+
+
 
 - (3992_PrototypeProposal) kinect info
 
@@ -37,3 +48,26 @@ CHANGE PEN PLOTTER TO PAINT-PEN PLOTTER
 - BLOCK DIAGRAM
 - DEMO PIC
 - PLOTTER
+
+-----
+
+MILESTONE 3 OCT 27
+
+After Ella provides the blank PCB and electrical components,
+Dana will solder the necessary electrical components---following the PCB schematic---that satisfy the specifications
+in creating the PCB for the CNC controller. 
+At the very most, this process should take 1 week: this accounts for any mistakes made while soldering as well as constant testing to avoid any electrical mishaps.
+
+The completed custom PCB CNC controller attached to the Arduino Uno. 
+
+Ella will create custom 3D-printed parts given by Dana's plotter design specifications which will take 1 week.
+ 
+The design includes the frame's bar and attachments for the stepper motor and toothed cable housing, paint-pen holder, and counterweights.
+Then Dana will assemble the plotter's hardware setup and connect it to the rest of the TagGang system in a temporary
+environment within 1 week.
+
+Modifications to GRBL for polar plotting should be ready in 1 week within the given time frame and before testing 
+of the assembled plotter. 
+
+The temporary environment will allow basic testing of the plotter which is conducted by both members and
+subsequently documented, taking 1 week.
