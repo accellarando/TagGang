@@ -17,7 +17,19 @@
 		<!-- Navbar to be populated here -->
 
 		<div class="container border rounded">
-			todo: details and documentation about the Kinect-based UI for TagGang.
+			todo: details and documentation about the Kinect-based UI for TagGang. <br>
+			<h2>Development installation instructions </h2>
+			Instructions for building the Kinect software and dependent libraries on Linux. Follow https://tayyabnaseer.blogspot.com/2012/05/installing-skeltrack-on-ubuntu.html with these minor changes.
+			<ol>
+				<li>Get libfreenect. </li>
+				<li>Get GFreenect.</li>
+				<li>In GFreenect, change all instances of <code>libfreenect &gt;= 0.0</code> in configure.ac to <code>libfreenect &gt;= 0</code>. It's on line 79 for me.</li>
+				<li><code>./autogen.sh</code></li>
+				<li>Rest of the instructions are the same for GFreenect.</li>
+				<li>For Skeltrack, edit tests/Makefile.am once you run into issues: https://github.com/joaquimrocha/Skeltrack/pull/31/commits/d52ab79ac76d4690e925ba0f630b673cdc3aa5f6</li>
+				<li>If the executable complains about missing shared libraries, follow the highlighted parts of the Blogspot guide.</li>
+				<li>You may also need to edit the application's Makefile to point to the libraries - see the <a href="https://github.com/accellarando/TagGangPrototype">prototype repo</a> for an example.</li>
+			</ol>
 		</div>
 	</body>
 </html>
