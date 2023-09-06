@@ -49,7 +49,7 @@ $(document).ready(function(){
 
 	$(".dropdown").click(function(){
 		$(this).dropdown();
-	};
+	});
 
 	// Code to mark current page as active
 	let thisPage = window.location.pathname.split("/").pop();
