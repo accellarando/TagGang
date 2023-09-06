@@ -8,7 +8,7 @@ const navElement = `
 				<a class="nav-link" href="/TagGang/logs.html">Meeting Logs</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link active" href="/TagGang/gallery.html">Gallery</a>
+				<a class="nav-link" href="/TagGang/gallery.html">Gallery</a>
 			</li>
 			<li class="nav-item">
 			</li>
@@ -22,11 +22,13 @@ const navElement = `
 		</ul>
 	</div>
 </nav>`;
-$("body").prepend(navElement);
-// Code to mark current page as active
-let thisPage = window.location.pathname.split("/").pop();
-console.log(thisPage);
-if (thisPage === "") {
-	thisPage = "index.html";
-}
-$(".navbar-nav a[href='" + thisPage + "']").addClass("active");
+$(document).ready(function(){
+	$("body").prepend(navElement);
+	// Code to mark current page as active
+	let thisPage = window.location.pathname.split("/").pop();
+	console.log(thisPage);
+	if (thisPage === "") {
+		thisPage = "index.html";
+	}
+	$(".navbar-nav a[href='" + thisPage + "']").addClass("active");
+});
