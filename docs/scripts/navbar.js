@@ -56,5 +56,5 @@ $(document).ready(function(){
 	if (thisPage === "") {
 		thisPage = "index.html";
 	}
-	$(".navbar-nav a[href='" + thisPage + "']").addClass("active");
+	$(".nav-item a[href='" + thisPage + "']").addClass("active");
 });
