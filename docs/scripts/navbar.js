@@ -8,9 +8,33 @@ const navElement = `
 				<a class="nav-link" href="/TagGang/logs.html">Meeting Logs</a>
 			</li>
 			<li class="nav-item">
+				<a class="nav-link" href="/TagGang/schedule.html">Schedule</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/TagGang/">Resources</a>
+			</li>
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="/TagGang/hardware/index.html" role="button" aria-haspopup="true" aria-expanded="false">Hardware</a>
+				<div class="dropdown-menu">
+					<a class="dropdown-item" href="/TagGang/hardware/plotter.html">Plotter</a>
+					<a class="dropdown-item" href="/TagGang/hardware/hat.html">CNC Pi HAT</a>
+				</div>
+			</li>
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="/TagGang/software/index.html" role="button" aria-haspopup="true" aria-expanded="false">Software</a>
+				<div class="dropdown-menu">
+					<a class="dropdown-item" href="/TagGang/software/gui.html">GUI</a>
+					<a class="dropdown-item" href="/TagGang/software/kinect.html">Kinect UI</a>
+				</div>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/TagGang/members.html">Team Members</a>
+			</li>
+			<li class="nav-item">
 				<a class="nav-link" href="/TagGang/gallery.html">Gallery</a>
 			</li>
 			<li class="nav-item">
+				<a class="nav-link" href="/TagGang/notes/resources.html">Resources</a>
 			</li>
 		</ul>
 		<ul class="navbar-nav ms-auto">
@@ -26,7 +50,6 @@ $(document).ready(function(){
 	$("body").prepend(navElement);
 	// Code to mark current page as active
 	let thisPage = window.location.pathname.split("/").pop();
-	console.log(thisPage);
 	if (thisPage === "") {
 		thisPage = "index.html";
 	}
