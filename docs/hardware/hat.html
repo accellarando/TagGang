@@ -16,8 +16,25 @@
 	<body>
 		<!-- Navbar to be populated here -->
 
-		<div class="container border rounded">
-			Page for details about the Pi HAT, including schematics, documentation, revision history, uhhhhh whatever else the fuck goes on here
+		<div class="container">
+			<h1>CNC Pi HAT</h1>
+			<p>As part of our project, we have designed a custom PCB to interface with the Raspberry Pi. Raspberry Pi has published <a href="https://github.com/raspberrypi/hats/">a specification</a> for breakout boards, called the Pi HAT (Hardware Attached on Top). These boards communicate with the Pi over GPIO pins, which can also be programmed to perform functions such as serial output.<br>
+			The TagGang project requires fine stepper motor and servo control. The Raspberry Pi, which runs a desktop operating system, is not equipped for this timing-sensitive application. To meet this need, the team has decided to design a Pi HAT with a microcontroller to extend the capabilities of the Raspberry Pi. This PCB contains a microcontroller, stepper motor drivers, and an Arduino. <br>
+			The team decided on an Arduino due to existing support for CNC applications, with libraries such as <a href="https://github.com/gnea/grbl">GRBL</a>. <br>
+			</p>
+
+			<h2>Schematic</h2>
+			<p>
+				Ella designed the schematic for the Pi HAT, which contains a microcontroller, two DRV8825 stepper motor drivers, and other hardware to link everything together (such as level shifters - the Pi runs at 3.3V, while the Arduino runs at 5V). <br>
+			</p>
+
+			<h2>PCB</h2>
+			<p>After the schematic was finished, the PCB was designed to the Pi HAT specification, linked above.</p>
+
+			<h2>Files</h2>
+			<p>
+			Browse <a href="https://github.com/accellarando/TagGang/tree/main/hardware">the GitHub</a> for the schematic, board layout, and bill of materials.
+			</p>
 		</div>
 	</body>
 </html>
