@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>TagGang Schedule</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<!-- Styles -->
+		<link rel="stylesheet" href="style.css">
+		<link rel="stylesheet" href="https://bootswatch.com/5/cyborg/bootstrap.min.css">
+
+		<!-- Scripts -->
+		<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+		<!-- ella todo: include navbar script -->
+		<!-- ella todo: write script for conditional table formatting -->
+	</head>
+	<body>
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+			<div class="container">
+				<a class="navbar-brand " href="/TagGang/index.html">TagGang</a>
+				<div class="navbar-collapse">
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/TagGang/logs.html">Meeting Logs</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link active" href="/TagGang/gallery.html">Gallery</a>
+					</li>
+				</ul>
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item">
+						<a class="nav-link active" href="https://github.com/accellarando/TagGang">
+							<img src="https://github.com/fluidicon.png" alt="GitHub" width="32" height="32">
+						</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+
+		<div class="container border rounded">
+			<h1> Schedule </h1>
+			<!-- Red, fill in this table, referring to proposal doc and today's slides -->
+			Refer to this table of milestones to track progress on the TagGang project.
+			<table class="table">
+				<tr> <!-- Table Row: row headers -->
+					<th>Number</th>
+					<th>Name</th>
+					<th>Depends On</th>
+					<th>Assigned To</th>
+					<th>Due Date</th>
+					<th>Completed Date</th>
+					<th>Details</th>
+					<th>Testing Strategy</th>
+				</tr>
+				<tr> <!-- Table Row -->
+					<td>0</td>
+					<td>Prototype</td>
+					<td>None</td>
+					<td>Both</td>
+					<td>4/15</td>
+					<td>4/15</td>
+					<td>Set up Kinect with a Linux laptop and an Arduino connected to a motor controller. <br>Track the user's right hand and move the attached stepper motor to mimic its motion.</td>
+					<td>Verify that stepper motor moves with Kinect input.</td>
+				</tr>
+				<!-- etc -->
+			</table>
+		</div>
+	</body>
+</html>

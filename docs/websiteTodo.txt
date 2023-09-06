@@ -1,0 +1,8 @@
+New tabs for:
+	Hardware
+		Pen plotter
+		PCB
+	Schedule & Milestones
+	Software docs
+
+Move navbar stuff into a js file to be included on every page - only need to edit in one place
