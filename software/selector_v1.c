@@ -1,95 +1,66 @@
 #include <gtk/gtk.h>
 
-// Global variables
-GtkWidget *fixed;
-GtkWidget *drawing_area;
-int gridSize = 32; // Adjust accordingly
-int maxX, maxY;
-int selectorX = 0, selectorY = 0;
-gboolean selectorHighlight = FALSE;
+#define GRID_SIZE 50
 
-gboolean draw_selector(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
-	if (selectorHighlight)
-	{
-		cairo_set_source_rgba(cr, 0.0, 0.8, 0.0, 0.5); // Green with 50% transparency
-		cairo_rectangle(cr, selectorX, selectorY, gridSize, gridSize);
-		cairo_fill(cr);
-		selectorHighlight = FALSE;
-	}
-    return TRUE;
+static GtkWidget *drawing_area;
+static int box_x = 0;
+static int box_y = 0;
+
+static void draw_highlight_box(cairo_t *cr, int x, int y) {
+    cairo_set_source_rgb(cr, 0, 1, 0); // Set color to green
+    cairo_rectangle(cr, x, y, GRID_SIZE, GRID_SIZE);
+    cairo_fill(cr);
 }
 
-gboolean key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
+static gboolean on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer data) {
+    draw_highlight_box(cr, box_x, box_y);
+    return FALSE;
+}
+
+static void move_box(int dx, int dy) {
+    box_x += dx * GRID_SIZE;
+    box_y += dy * GRID_SIZE;
+
+    gtk_widget_queue_draw(drawing_area);
+}
+
+static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
     switch (event->keyval) {
         case GDK_KEY_Up:
-            selectorY -= gridSize;
-            g_print("UP\n");
-            selectorHighlight = TRUE;
+            move_box(0, -1);
             break;
         case GDK_KEY_Down:
-            selectorY += gridSize;
-            g_print("DOWN\n");
-            selectorHighlight = TRUE;
+            move_box(0, 1);
             break;
         case GDK_KEY_Left:
-            selectorX -= gridSize;
-            g_print("LEFT\n");
-            selectorHighlight = TRUE;
+            move_box(-1, 0);
             break;
         case GDK_KEY_Right:
-            selectorX += gridSize;
-            g_print("RIGHT\n");
-            selectorHighlight = TRUE;
+            move_box(1, 0);
             break;
         default:
-            return FALSE; // Ignore other keys for now
+            break;
     }
-
-    // Clamps the selector within the boundary
-    selectorX = MAX(0, MIN(selectorX, maxX - gridSize));
-    selectorY = MAX(0, MIN(selectorY, maxY - gridSize));
-
-    // Snap to the grid
-    selectorX = (selectorX / gridSize) * gridSize;
-    selectorY = (selectorY / gridSize) * gridSize;
-
-    // Redraw the fixed container
-    gtk_widget_queue_draw(GTK_WIDGET(fixed));
-
-    return TRUE;
-}
-
-gboolean draw_cb(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
-    draw_selector(widget, cr, user_data);
-    return FALSE;
 }
 
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "Grid Selector");
-    gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
+    gtk_window_set_title(GTK_WINDOW(window), "Snapping Box");
+    gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
-    fixed = gtk_fixed_new();
-    gtk_container_add(GTK_CONTAINER(window), fixed);
-
     drawing_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(drawing_area, 400, 400);
-    g_signal_connect(G_OBJECT(drawing_area), "draw", G_CALLBACK(draw_cb), NULL);
-    gtk_fixed_put(GTK_FIXED(fixed), drawing_area, 0, 0);
+    gtk_container_add(GTK_CONTAINER(window), drawing_area);
 
-    // Connect the key press event
-    g_signal_connect(G_OBJECT(window), "key-press-event", G_CALLBACK(key_press_event), NULL);
+    g_signal_connect(G_OBJECT(drawing_area), "draw", G_CALLBACK(on_draw_event), NULL);
+    g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press), NULL);
 
-    // Get the size of the fixed container
-    gtk_widget_get_size_request(fixed, &maxX, &maxY);
+    gtk_widget_set_events(window, GDK_KEY_PRESS_MASK);
 
-    // Show all the widgets
     gtk_widget_show_all(window);
 
-    // Run the GTK main loop
     gtk_main();
 
     return 0;
