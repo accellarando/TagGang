@@ -1,13 +1,13 @@
 #include <gtk/gtk.h>
+#include <math.h>
 
 #define GRID_SIZE 50
-#define SNAP_INTERVAL 0.1
 
 static GtkWidget *drawing_area;
-static double box_x = 0;
-static double box_y = 0;
+static int box_x = 0;
+static int box_y = 0;
 
-static void draw_highlight_box(cairo_t *cr, double x, double y) {
+static void draw_highlight_box(cairo_t *cr, int x, int y) {
     cairo_set_source_rgb(cr, 0, 1, 0); // Set color to green
     cairo_rectangle(cr, x, y, GRID_SIZE, GRID_SIZE);
     cairo_fill(cr);
@@ -18,13 +18,14 @@ static gboolean on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer data) {
     return FALSE;
 }
 
-static void move_box(double dx, double dy) {
+static void move_box(int dx, int dy) {
     box_x += dx * GRID_SIZE;
     box_y += dy * GRID_SIZE;
+    
+    // snap?
+    box_x = floor(box_x / GRID_SIZE) * GRID_SIZE;
+    box_y = floor(box_y / GRID_SIZE) * GRID_SIZE;
 
-    // Snap to grid
-    box_x = SNAP_INTERVAL * GRID_SIZE * floor(box_x / (SNAP_INTERVAL * GRID_SIZE));
-    box_y = SNAP_INTERVAL * GRID_SIZE * floor(box_y / (SNAP_INTERVAL * GRID_SIZE));
 
     gtk_widget_queue_draw(drawing_area);
 }
@@ -32,16 +33,16 @@ static void move_box(double dx, double dy) {
 static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
     switch (event->keyval) {
         case GDK_KEY_Up:
-            move_box(0, -SNAP_INTERVAL);
+            move_box(0, -1);
             break;
         case GDK_KEY_Down:
-            move_box(0, SNAP_INTERVAL);
+            move_box(0, 1);
             break;
         case GDK_KEY_Left:
-            move_box(-SNAP_INTERVAL, 0);
+            move_box(-1, 0);
             break;
         case GDK_KEY_Right:
-            move_box(SNAP_INTERVAL, 0);
+            move_box(1, 0);
             break;
         default:
             break;
