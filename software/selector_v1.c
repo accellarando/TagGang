@@ -13,8 +13,10 @@ key_press_event (GtkWidget* widget,
                 GdkEventKey *event,
                 gpointer user_data)
 {
-    int x, y;
-    gtk_window_get_position(selector, &x, &y);
+	GdkRectangle allocation;
+    gtk_widget_get_allocation(selector, &allocation);
+    int x = allocation.x;
+    int y = allocation.y;
 
     switch(event->keyval) // From struct GdkEventKey
     {
