@@ -2,12 +2,16 @@
 #include <math.h>
 
 #define GRID_SIZE 50
-#define SNAP_INTERVAL 0.1
+#define SNAP_INTERVAL 0.5
+#define WINDOW_WIDTH 500
+#define WINDOW_HEIGHT 500
 
+/* Global variables */
 static GtkWidget *drawing_area;
-static double box_x = 0;
-static double box_y = 0;
+static double box_x = 0; // x-coordinates of the box
+static double box_y = 0; // y-coordinates of the box
 
+/* */
 static void draw_highlight_box(cairo_t *cr, int x, int y) {
     cairo_set_source_rgb(cr, 0, 1, 0); // Set color to green
     cairo_rectangle(cr, x, y, GRID_SIZE, GRID_SIZE);
@@ -26,6 +30,18 @@ static void move_box(double dx, double dy) {
     // snap?
     box_x = SNAP_INTERVAL* GRID_SIZE * (int)(box_x / (SNAP_INTERVAL * GRID_SIZE));
     box_y = SNAP_INTERVAL* GRID_SIZE * (int)(box_y / (SNAP_INTERVAL * GRID_SIZE));
+    
+    if (box_x < 0)
+		box_x = 0;
+		
+    if (box_y < 0)
+		box_y = 0;
+    
+    if (box_x + GRID_SIZE > WINDOW_WIDTH)
+		box_x = WINDOW_WIDTH - GRID_SIZE;
+		
+    if (box_y + GRID_SIZE > WINDOW_HEIGHT)
+		box_y = WINDOW_HEIGHT - GRID_SIZE;
 
 
     gtk_widget_queue_draw(drawing_area);
