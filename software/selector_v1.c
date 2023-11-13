@@ -81,7 +81,11 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
 
 /* !!! fix to load a PNG file (eventuall load all images and their set coordinates) */
 static void load_image(const char *filename) {
-	g_print("Loading PNG file: %s\n", filename);
+	gchar *full_path = g_build_filename("images", filename, NULL);
+	
+	g_print("Loading PNG file: %s\n", full_path);
+	
+	g_free(full_path);
 }
 
 int main(int argc, char *argv[]) {
