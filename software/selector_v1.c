@@ -2,13 +2,6 @@
 
 #include <gtk/gtk.h>
 
-static void
-print_hello (GtkWidget *widget,
-             gpointer   data)
-{
-  g_print ("Hello World\n");
-}
-
 // Global vars
 GtkWidget *selector;
 int gridSize = 32; // Adjust accordingly
@@ -27,15 +20,19 @@ key_press_event (GtkWidget* self,
     {
         case GDK_KEY_Up:
             y -= gridSize;
+            g_print ("UP\n");
             break;
         case GDK_KEY_Down:
             y += gridSize;
+            g_print ("DOWN\n");
             break;
         case GDK_KEY_Left:
             x -= gridSize;
+            g_print ("LEFT\n");
             break;
         case GDK_KEY_Right:
             x += gridSize;
+            g_print ("RIGHT\n");
             break;
         default:
             return FALSE;  // Ignore other keys for now
@@ -55,6 +52,14 @@ key_press_event (GtkWidget* self,
     return TRUE;
 }
 
+/*
+static void
+print_hello (GtkWidget *widget,
+             gpointer   data)
+{
+  g_print ("Hello World\n");
+} */
+
 
 int
 main (int   argc,
@@ -69,12 +74,28 @@ main (int   argc,
   gtk_init (&argc, &argv);
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title(GTK_WINDOW(window), "Grid Selector");
-  gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
+  gtk_window_set_title(GTK_WINDOW (window), "Grid Selector");
+  gtk_window_set_default_size(GTK_WINDOW (window), 400, 400);
 
   fixed = gtk_fixed_new();
+  gtk_container_add(GTK_CONTAINER (window), fixed);
 
-
+  selector = gtk_button_new_with_label("Selector"); // CHANGE!
+  gtk_fixed_put(GTK_FIXED(fixed), selector, 0, 0);
+  
+  // Connect the key press event
+  g_signal_connect(G_OBJECT(window), "key-press-event", G_CALLBACK(on_key_press), NULL);
+  
+  // Connect the destroy event to quit the application
+  g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+  
+  // Show all the widgets
+  gtk_widget_show_all(window);
+  
+  // Run the GTK main loop
+  gtk_main();
+  
+  return 0;
 
   /* Construct a GtkBuilder instance and load our UI description ... TODO
   builder = gtk_builder_new ();
@@ -85,7 +106,7 @@ main (int   argc,
       return 1;
     } */
 
-  /* Connect signal handlers to the constructed widgets. */
+  /* Connect signal handlers to the constructed widgets.
   window = gtk_builder_get_object (builder, "window");
   g_signal_connect (window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
 
@@ -100,5 +121,5 @@ main (int   argc,
 
   gtk_main ();
 
-  return 0;
+  return 0; */
 }
