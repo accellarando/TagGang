@@ -15,3 +15,15 @@ with the selected area's coordinates translated to real-life canvas coordinates
 - find out real canvas size and coordinates (fix polar/cartesian)
 - find out if there needs to be any image processing
 - what CAM software?
+
+
+# NOTES
+Reference GTK [Getting Started](https://docs.gtk.org/gtk3/getting_started.html)
+- GTK window with a fixed-size selector that can be moved using arrow keys and snaps to a grid
+- Arrow keys, [Widget::key-press-event](https://docs.gtk.org/gtk3/signal.Widget.key-press-event.html)
+
+## TODO
+- Open application window with commandline args takes in an image file (.png/.jpg): GApplication entry points GIO documentation... open() = virtual function, which gets called when the app is launched with commandline args.
+- Mak XML backing file?
+
+
