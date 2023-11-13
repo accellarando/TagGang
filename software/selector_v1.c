@@ -10,7 +10,7 @@ int maxX, maxY;
 
 gboolean
 key_press_event (GtkWidget* self,
-                GdkEventKey event,
+                GdkEventKey *event,
                 gpointer user_data)
 {
     int x, y;
@@ -19,6 +19,7 @@ key_press_event (GtkWidget* self,
     switch(event->keyval) // From struct GdkEventKey
     {
         case GDK_KEY_Up:
+        
             y -= gridSize;
             g_print ("UP\n");
             break;
@@ -47,7 +48,7 @@ key_press_event (GtkWidget* self,
     y = (y / gridSize) * gridSize;
 
     // Set new position
-    gtk_fixed_move(GTK_FIXED(widget), selector, x, y);
+    gtk_fixed_move(GTK_FIXED(self), selector, x, y);
 
     return TRUE;
 }
@@ -84,7 +85,7 @@ main (int   argc,
   gtk_fixed_put(GTK_FIXED(fixed), selector, 0, 0);
   
   // Connect the key press event
-  g_signal_connect(G_OBJECT(window), "key-press-event", G_CALLBACK(on_key_press), NULL);
+  g_signal_connect(G_OBJECT(window), "key-press-event", G_CALLBACK(key_press_event), NULL);
   
   // Connect the destroy event to quit the application
   g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
