@@ -9,12 +9,12 @@ int selectorSize = 32; // Adjust accordingly
 int maxX, maxY;
 
 gboolean
-key_press_event (GtkWidget* self,
+key_press_event (GtkWidget* widget,
                 GdkEventKey *event,
                 gpointer user_data)
 {
     int x, y;
-    gtk_widget_get_position(selector, &x, &y);
+    gtk_window_get_position(selector, &x, &y);
 
     switch(event->keyval) // From struct GdkEventKey
     {
@@ -48,7 +48,7 @@ key_press_event (GtkWidget* self,
     y = (y / gridSize) * gridSize;
 
     // Set new position
-    gtk_fixed_move(GTK_FIXED(self), selector, x, y);
+    gtk_fixed_move(GTK_FIXED(widget), selector, x, y);
 
     return TRUE;
 }
@@ -67,7 +67,7 @@ main (int   argc,
       char *argv[])
 {
   //GtkBuilder *builder;
-  GObject *window;
+  GtkWidget *window;
   GtkWidget *fixed;
   //GObject *button;
   GError *error = NULL;
