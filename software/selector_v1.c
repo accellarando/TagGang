@@ -51,6 +51,11 @@ static void move_box(double dx, double dy) {
     gtk_widget_queue_draw(drawing_area); // Redraw the drawing area
 }
 
+/* !!! fix to send out to gcode CAM instead of printing */
+static void send_coordinates() {
+	g_print("Box Coordinates: (%.0f, %.0f)\n", box_x, box_y);
+}
+
 /* Callback function for the "key-press-event" signal */
 static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
 	// Handle arrow key events to move the box in snapping intervals
@@ -67,6 +72,8 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
         case GDK_KEY_Right:
             move_box(SNAP_INTERVAL, 0);
             break;
+        case GDK_KEY_Return:
+			send_coordinates();
         default:
             break;
     }
