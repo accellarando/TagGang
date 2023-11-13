@@ -25,5 +25,6 @@ Reference GTK [Getting Started](https://docs.gtk.org/gtk3/getting_started.html)
 ## TODO
 - Open application window with commandline args takes in an image file (.png/.jpg): GApplication entry points GIO documentation... open() = virtual function, which gets called when the app is launched with commandline args.
 - Mak XML backing file?
+- Replaces the selector button and make a function that is called when the drawing area needs to be redrawn, and it uses Cairo to draw a highlighted rectangle based on the selector's position. The selectorHighlighted variable is used to control whether the rectangle should be drawn. The key press event now updates the selector position and triggers a redraw of the fixed container.
 
 
