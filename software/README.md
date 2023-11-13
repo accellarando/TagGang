@@ -27,5 +27,6 @@ Reference GTK [Getting Started](https://docs.gtk.org/gtk3/getting_started.html)
 - Mak XML backing file?
 - Replaces the selector button and make a function that is called when the drawing area needs to be redrawn, and it uses Cairo to draw a highlighted rectangle based on the selector's position. The selectorHighlighted variable is used to control whether the rectangle should be drawn. The key press event now updates the selector position and triggers a redraw of the fixed container.
 - images transparent 400x400
+- program before it sends images in number order increasing (1, 2, 3...) and GUI waits for filename numbered and once place will free up and restart the process again?
 
 
