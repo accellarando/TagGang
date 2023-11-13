@@ -79,9 +79,28 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
     }
 }
 
+/* !!! fix to load a PNG file (eventuall load all images and their set coordinates) */
+static void load_image(const char *filename) {
+	g_print("Loading PNG file: %s\n", filename);
+}
+
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv); // Init GTK
     
+    const char *png_filename = NULL;
+    
+    // parse command line args
+    for (int i = 1; i < argc; i++) {
+		if (g_str_has_prefix(argv[i], "--png="))
+			png_filename = argv[i] + 6; // Skip "--png="
+	}
+	
+	// Check if a PNG file was specified
+	if (png_filename != NULL)
+		load_image(png_filename);
+	else
+		g_print("trying to still run without image in debugging\n");
+		
     // Create window
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Snapping Box");
