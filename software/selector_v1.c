@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
     fixed = gtk_fixed_new();
     gtk_container_add(GTK_CONTAINER(window), fixed);
 
-    selector = gtk_button_new_with_label("Selector");
+    selector = gtk_button_new_with_label("Selector"); // TODO: change into grid
     gtk_fixed_put(GTK_FIXED(fixed), selector, 0, 0);
 
     // Connect the key press event
