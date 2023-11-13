@@ -50,7 +50,7 @@ key_press_event (GtkWidget* widget,
     y = (y / gridSize) * gridSize;
 
     // Set new position
-    gtk_fixed_move(GTK_FIXED(widget), selector, x, y);
+    gtk_fixed_move(GTK_FIXED(user_data), selector, x, y);
 
     return TRUE;
 }
