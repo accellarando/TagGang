@@ -88,7 +88,7 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
             move_box(SNAP_INTERVAL, 0);
             break;
         case GDK_KEY_Return:
-            // send_coordinates();
+             send_coordinates();
 
             image_x = box_x;
             image_y = box_y;
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
 		
     // Create window
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "Snapping Box");
+    gtk_window_set_title(GTK_WINDOW(window), "Tag Coordinate Selector");
     gtk_window_set_default_size(GTK_WINDOW(window), WINDOW_WIDTH, WINDOW_HEIGHT);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
