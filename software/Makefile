@@ -11,7 +11,7 @@ $(EXECUTABLE): $(SRC)
 
 .PHONY: run
 run: $(EXECUTABLE)
-	./$(EXECUTABLE) images/stick-figure.png
+	./$(EXECUTABLE) images/flower.png
 
 .PHONY: clean
 clean:
