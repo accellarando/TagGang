@@ -100,24 +100,22 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
         case GDK_KEY_Return:
             //send_coordinates();
 
+            if (display_image) {
+                // Shrink the image to the size of the selector box
+                GdkPixbuf *shrunken_pixbuf = gdk_pixbuf_scale_simple(
+                    image_pixbuf,
+                    GRID_SIZE, GRID_SIZE,
+                    GDK_INTERP_BILINEAR
+                );
+
+                g_object_unref(image_pixbuf);
+                image_pixbuf = shrunken_pixbuf;
+            }
+
             image_x = box_x;
             image_y = box_y;
 
             display_image = !display_image;  // Toggle the display_image flag
-
-            if (display_image && image_file_path != NULL) {
-                if (image_pixbuf != NULL) {
-                    g_object_unref(image_pixbuf);
-                    image_pixbuf = NULL;
-                }
-                GError *error = NULL;
-                image_pixbuf = gdk_pixbuf_new_from_file(image_file_path, &error);
-
-                if (error != NULL) {
-                    g_printerr("Error loading %s: %s\n", image_file_path, error->message);
-                    g_error_free(error);
-                }
-            }
 
             gtk_widget_queue_draw(drawing_area);
             break;
@@ -125,6 +123,7 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
             break;
     }
 }
+
 static void load_and_set_image() {
     if (image_file_path != NULL) {
         if (image_pixbuf != NULL) {
