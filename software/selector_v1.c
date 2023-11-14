@@ -8,21 +8,25 @@
 #define WINDOW_HEIGHT 500
 
 static GtkWidget *drawing_area;
-// Coordinates of the box
+static GList *image_list = NULL; // List to store loaded images and their coordinates
 static double box_x = 0;
 static double box_y = 0;
+static char *image_file_path = NULL;
+static GdkPixbuf *image_pixbuf = NULL;
 
-/* Draws a selector box in the area (using Cairo API)*/
+/* Draws a selector box onto the drawing area (using Cairo API) */
 static void draw_selector(cairo_t *cr, int x, int y) {
     cairo_set_source_rgba(cr, 0.0, 0.8, 0.0, 0.5); // Green 50% transparency
     cairo_rectangle(cr, x, y, GRID_SIZE, GRID_SIZE); // Create rectangle at position (x,y) w/ GRID_SIZE dimensions 
     cairo_fill(cr); // Fill rectangle with green
 }
 
-/* Callback function for the "draw" signal */
-static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
-    draw_selector(cr, box_x, box_y); // draw selector box
-    return FALSE; // Indicate draw operation is complete
+/* Draws the loaded image onto the drawing area (using Cairo API) */
+static void draw_images(cairo_t *cr) {
+	if(image_pixbuf != NULL) {
+		gdk_cairo_set_source_pixbuf(cr, image_pixbuf, box_x, box_y);
+		cairo_paint(cr);
+	}
 }
 
 /* Moves the selector box in intervals within window boundaries */
@@ -51,6 +55,13 @@ static void move_box(double dx, double dy) {
     gtk_widget_queue_draw(drawing_area); // Redraw the drawing area
 }
 
+/* Callback function for the "draw" signal */
+static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
+    draw_selector(cr, box_x, box_y); // draw selector box
+    draw_images(cr); // draw loaded images
+    return FALSE; // Indicate draw operation is complete
+}
+
 /* !!! fix to send out to gcode CAM instead of printing */
 static void send_coordinates() {
 	g_print("Box Coordinates: (%.0f, %.0f)\n", box_x, box_y);
@@ -73,37 +84,35 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
             move_box(SNAP_INTERVAL, 0);
             break;
         case GDK_KEY_Return:
-			send_coordinates();
+			//send_coordinates();
+			if(image_file_path != NULL) {
+				if(image_pixbuf != NULL) {
+					g_object_unref(image_pixbuf);
+					image_pixbuf = NULL;
+				}
+				GError * error = NULL;
+				image_pixbuf = gdk_pixbuf_new_from_file(image_file_path, &error);
+				
+				if(error != NULL) {
+					g_printerr("Error loading", error->message);
+					g_error_free(error);
+				}
+				gtk_widget_queue_draw(drawing_area);
+			}
         default:
             break;
     }
 }
 
-/* !!! fix to load a PNG file (eventuall load all images and their set coordinates) */
-static void load_image(const char *filename) {
-	gchar *full_path = g_build_filename("images", filename, NULL);
-	
-	g_print("Loading PNG file: %s\n", full_path);
-	
-	g_free(full_path);
-}
-
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv); // Init GTK
     
-    const char *png_filename = NULL;
-    
-    // parse command line args
-    for (int i = 1; i < argc; i++) {
-		if (g_str_has_prefix(argv[i], "--png="))
-			png_filename = argv[i] + 6; // Skip "--png="
+    if (argc != 2) {
+		g_print("Error", argv[0]);
+		return -1;
 	}
 	
-	// Check if a PNG file was specified
-	if (png_filename != NULL)
-		load_image(png_filename);
-	else
-		g_print("trying to still run without image in debugging\n");
+	image_file_path = argv[1];
 		
     // Create window
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -123,5 +132,8 @@ int main(int argc, char *argv[]) {
     gtk_widget_show_all(window); // Show all widgets in window
 
     gtk_main(); // Start GTK main loop
+    
+    g_list_free_full(image_list, g_free); // Free the memory allocated for the ImageInfo struct
+    
     return 0; // Indicate successfull program completion
 }
