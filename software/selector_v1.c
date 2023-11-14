@@ -15,6 +15,8 @@ static double image_x = 0;
 static double image_y = 0;
 static char *image_file_path = NULL;
 static GdkPixbuf *image_pixbuf = NULL;
+static gboolean display_image = FALSE;  // Flag to control image display
+
 
 /* Draws a selector box onto the drawing area (using Cairo API) */
 static void draw_selector(cairo_t *cr, int x, int y) {
@@ -65,7 +67,12 @@ static void move_box(double dx, double dy) {
 /* Callback function for the "draw" signal */
 static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
     draw_selector(cr, box_x, box_y); // draw selector box
-    draw_images(cr); // draw loaded images
+
+    // Draw loaded images only if the display_image flag is true
+    if (display_image) {
+        draw_images(cr);
+    }
+
     return FALSE; // Indicate draw operation is complete
 }
 
@@ -96,7 +103,9 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
             image_x = box_x;
             image_y = box_y;
 
-            if (image_file_path != NULL) {
+            display_image = !display_image;  // Toggle the display_image flag
+
+            if (display_image && image_file_path != NULL) {
                 if (image_pixbuf != NULL) {
                     g_object_unref(image_pixbuf);
                     image_pixbuf = NULL;
@@ -105,22 +114,40 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
                 image_pixbuf = gdk_pixbuf_new_from_file(image_file_path, &error);
 
                 if (error != NULL) {
-                    g_printerr("Error loading", error->message);
+                    g_printerr("Error loading %s: %s\n", image_file_path, error->message);
                     g_error_free(error);
                 }
-                gtk_widget_queue_draw(drawing_area);
             }
+
+            gtk_widget_queue_draw(drawing_area);
             break;
         default:
             break;
     }
 }
+static void load_and_set_image() {
+    if (image_file_path != NULL) {
+        if (image_pixbuf != NULL) {
+            g_object_unref(image_pixbuf);
+            image_pixbuf = NULL;
+        }
+        GError *error = NULL;
+        image_pixbuf = gdk_pixbuf_new_from_file(image_file_path, &error);
 
+        if (error != NULL) {
+            g_printerr("Error loading %s: %s\n", image_file_path, error->message);
+            g_error_free(error);
+        }
+
+        // Set the image in the image_display_area
+        gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), image_pixbuf);
+    }
+}
 int main(int argc, char *argv[]) {
-    gtk_init(&argc, &argv); // Init GTK
+    gtk_init(&argc, &argv);
 
     if (argc != 2) {
-        g_print("Error", argv[0]);
+        g_print("Error: Please provide an image file path\n");
         return -1;
     }
 
@@ -137,22 +164,25 @@ int main(int argc, char *argv[]) {
 
     // Create drawing area
     drawing_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(drawing_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT); // Set size for the drawing area
+    gtk_widget_set_size_request(drawing_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
     gtk_box_pack_start(GTK_BOX(vbox), drawing_area, TRUE, TRUE, 0);
 
     // Create image display area
     image_display_area = gtk_image_new();
-    gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT); // Set size for the image display area
+    gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
     gtk_box_pack_start(GTK_BOX(vbox), image_display_area, TRUE, TRUE, 0);
 
-    // Connects the signals to their respective callback event functions
+    // Load and set the image
+    load_and_set_image();
+
+    // Connect signals to callback functions
     g_signal_connect(G_OBJECT(drawing_area), "draw", G_CALLBACK(on_draw), NULL);
     g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press), NULL);
 
-    gtk_widget_set_events(window, GDK_KEY_PRESS_MASK); // Enable key press events for the window
-    gtk_widget_show_all(window); // Show all widgets in window
+    gtk_widget_set_events(window, GDK_KEY_PRESS_MASK);
+    gtk_widget_show_all(window);
 
-    gtk_main(); // Start GTK main loop
+    gtk_main();
 
-    return 0; // Indicate successful program completion
+    return 0;
 }
