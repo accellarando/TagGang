@@ -11,6 +11,8 @@ static GtkWidget *drawing_area;
 static GList *image_list = NULL; // List to store loaded images and their coordinates
 static double box_x = 0;
 static double box_y = 0;
+static double image_x = 0;
+static double image_y = 0;
 static char *image_file_path = NULL;
 static GdkPixbuf *image_pixbuf = NULL;
 
@@ -24,7 +26,7 @@ static void draw_selector(cairo_t *cr, int x, int y) {
 /* Draws the loaded image onto the drawing area (using Cairo API) */
 static void draw_images(cairo_t *cr) {
 	if(image_pixbuf != NULL) {
-		gdk_cairo_set_source_pixbuf(cr, image_pixbuf, box_x, box_y);
+		gdk_cairo_set_source_pixbuf(cr, image_pixbuf, image_x, image_y);
 		cairo_paint(cr);
 	}
 }
@@ -85,6 +87,10 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
             break;
         case GDK_KEY_Return:
 			//send_coordinates();
+			
+			image_x = box_x;
+			image_y = box_y;
+			
 			if(image_file_path != NULL) {
 				if(image_pixbuf != NULL) {
 					g_object_unref(image_pixbuf);
