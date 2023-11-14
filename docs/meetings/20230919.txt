@@ -1,0 +1,8 @@
+look up reflow oven datasheet for the solder we have
+
+Same goal for next week - get board soldered
+
+Other tips on soldering:
+	Clean board with alcohol before soldering, then don't touch pads (without gloves)
+	Don't use too much solder paste!! You need way less than you think
+
