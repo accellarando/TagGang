@@ -3,6 +3,7 @@
 
 #include <gtk/gtk.h>
 #include <math.h>
+#include <main.h>
 
 // Point structure
 typedef struct {
@@ -10,7 +11,8 @@ typedef struct {
 	gdouble y;
 } DoublePoint;
 
-void activate_canvas (GtkApplication* app, gpointer user_data);
+void activate_canvas (GtkApplication* app, 
+		gpointer user_data);
 
 extern GList* points_list;
 #endif

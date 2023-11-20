@@ -10,8 +10,9 @@
  */
 #include <drawable_canvas.h>
 
-cairo_surface_t *surface = NULL;
-
+cairo_surface_t  *surface		= NULL;
+GtkApplication	 *app			= NULL;
+static GtkWidget *window		= NULL;
 /***
  * This function clears the drawing off of the surface.
  */
@@ -94,8 +95,7 @@ static void draw_brush (GtkWidget *widget,
 		cairo_line_to(cr, x, y);
 		cairo_stroke(cr);
 		/* Now invalidate the drawing area along the line. */
-		gtk_widget_queue_draw_area (widget, MIN(last_x, x) - 6, MIN(last_y, y) - 6, ABS(dx)+12.0, ABS(dy)+12.0);
-		//x - dx - 6 == x - (x - last_x) - 6 == last_x - 6
+		gtk_widget_queue_draw_area (widget, MIN(last_x, x) - 12, MIN(last_y, y) - 12, ABS(dx)+24.0, ABS(dy)+24.0);
 	}
 	else{
 		cairo_rectangle (cr, x - 3, y - 3, 6, 6);
@@ -139,6 +139,14 @@ static gboolean button_press_event_cb (GtkWidget      *widget,
 		// Clear the screen
 		clear_surface();
 		gtk_widget_queue_draw (widget);
+
+		// Prepare for moving to next stage
+		if (surface)
+			cairo_surface_destroy (surface);
+		
+		// Emit a "done" notify signal to start the selector stage
+		// g_object_set_property(window, "done", TRUE);
+		gtk_window_set_title(window, "Place your tag");
 	}
 
 	/* We've handled the event, stop processing */
@@ -191,14 +199,11 @@ static void close_window (void)
 }
 
 void activate_canvas (GtkApplication *app,
-		gpointer        user_data)
+		gpointer	 user_data)
 {
-	GtkWidget *window;
 	GtkWidget *frame;
 	GtkWidget *drawing_area;
-
-	window = gtk_application_window_new (app);
-	gtk_window_set_title (GTK_WINDOW (window), "Drawing Area");
+	window = (GtkWidget*) user_data;
 
 	g_signal_connect (window, "destroy", G_CALLBACK (close_window), NULL);
 

@@ -1,11 +1,5 @@
-#include <gtk/gtk.h>
-#include <math.h>
-
-/* Global variables */
-#define GRID_SIZE 50
-#define SNAP_INTERVAL 0.5
-#define WINDOW_WIDTH 800 // Increased window width to accommodate the image display area
-#define WINDOW_HEIGHT 500
+#include <selector.h>
+#include <stdio.h>
 
 static GtkWidget *drawing_area;
 static GtkWidget *image_display_area; // GtkImage widget for displaying the loaded image
@@ -18,6 +12,9 @@ static GdkPixbuf *image_pixbuf = NULL;
 static GdkPixbuf *preview_pixbuf = NULL;
 static gboolean display_image = FALSE;  // Flag to control image display
 
+void activate_selector(GtkApplication *app, gpointer *data){
+	printf("Selector should be activated now.");
+}
 
 /* Draws a selector box onto the drawing area (using Cairo API) */
 static void draw_selector(cairo_t *cr, int x, int y) {
@@ -149,6 +146,7 @@ static void load_and_set_image() {
     }
 }
 
+/*
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
@@ -192,3 +190,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+*/
