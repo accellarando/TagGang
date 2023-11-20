@@ -15,6 +15,7 @@ static double image_x = 0;
 static double image_y = 0;
 static char *image_file_path = NULL;
 static GdkPixbuf *image_pixbuf = NULL;
+static GdkPixbuf *preview_pixbuf = NULL;
 static gboolean display_image = FALSE;  // Flag to control image display
 
 
@@ -59,9 +60,9 @@ static void move_box(double dx, double dy) {
     gtk_widget_queue_draw(drawing_area); // Redraw the drawing area
 
     // Update the image display area with the loaded image
-    if (image_pixbuf != NULL) {
-        gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), image_pixbuf);
-    }
+    /* if (image_pixbuf != NULL) { */
+    /*     gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), image_pixbuf); */
+    /* } */
 }
 
 /* Callback function for the "draw" signal */
@@ -130,8 +131,13 @@ static void load_and_set_image() {
             g_object_unref(image_pixbuf);
             image_pixbuf = NULL;
         }
+        if (preview_pixbuf != NULL) {
+            g_object_unref(preview_pixbuf);
+            preview_pixbuf = NULL;
+        }
         GError *error = NULL;
         image_pixbuf = gdk_pixbuf_new_from_file(image_file_path, &error);
+		preview_pixbuf = gdk_pixbuf_new_from_file(image_file_path, &error); 
 
         if (error != NULL) {
             g_printerr("Error loading %s: %s\n", image_file_path, error->message);
@@ -139,9 +145,10 @@ static void load_and_set_image() {
         }
 
         // Set the image in the image_display_area
-        gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), image_pixbuf);
+        gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), preview_pixbuf);
     }
 }
+
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 

@@ -1,18 +1,26 @@
 CC = gcc
 CFLAGS = `pkg-config --cflags gtk+-x11-3.0`
 LIBS = `pkg-config --libs gtk+-x11-3.0`
-SRC = selector_v1.c
-EXECUTABLE = selector
+INCLUDES = include/
+SRC_SELECTOR = selector_v1.c
+SRC_CANVAS = drawable_canvas.c
+SRC_MAIN = main.c
+EXECUTABLE_SELECTOR = selector
+EXECUTABLE_CANVAS = canvas
+EXECUTABLE_MAIN = TagGang
 
-all: $(EXECUTABLE)
+all: $(EXECUTABLE_MAIN)
 
-$(EXECUTABLE): $(SRC)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+$(EXECUTABLE_MAIN): $(SRC_CANVAS) 
+	$(CC) $(CFLAGS) -o $@ $^ $(SRC_MAIN) -I$(INCLUDES) $(LIBS)
+
+$(EXECUTABLE_SELECTOR): $(SRC_SELECTOR)
+	$(CC) $(CFLAGS) -o $@ $^ -I$(INCLUDES) $(LIBS)
 
 .PHONY: run
-run: $(EXECUTABLE)
-	./$(EXECUTABLE) images/flower.png
+run: $(EXECUTABLE_SELECTOR)
+	./$(EXECUTABLE_SELECTOR) images/flower.png
 
 .PHONY: clean
 clean:
-	rm -f $(EXECUTABLE)
+	rm -f $(EXECUTABLE_MAIN) $(EXECUTABLE_SELECTOR)
