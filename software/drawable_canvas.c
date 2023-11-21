@@ -12,6 +12,8 @@
 
 cairo_surface_t  *surface		= NULL;
 GtkApplication	 *app			= NULL;
+GtkWidget *frame;
+GtkWidget *drawing_area;
 
 /***
  * This function clears the drawing off of the surface.
@@ -143,6 +145,10 @@ static gboolean button_press_event_cb (GtkWidget      *widget,
 		// Prepare for moving to next stage
 		if (surface)
 			cairo_surface_destroy (surface);
+		/* gtk_widget_destroy(widget); */
+		gtk_widget_destroy(frame);
+		gtk_widget_destroy(drawing_area);
+
 		
 		// Change window title to next stage.
 		// This also triggers the signal router for you.
@@ -201,8 +207,6 @@ static void close_window (void)
 void activate_canvas (GtkApplication *app,
 		gpointer	 user_data)
 {
-	GtkWidget *frame;
-	GtkWidget *drawing_area;
 	window = (GtkWidget*) user_data;
 
 	g_signal_connect (window, "destroy", G_CALLBACK (close_window), NULL);

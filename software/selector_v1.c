@@ -1,3 +1,19 @@
+/**
+ * This part of the TagGang program allows users to select where on the canvas their
+ * tag will be drawn.
+ *
+ * TODO:
+ *     - Support state, ie render previous images in their locations (save entire thing to png maybe?)
+ *     - Buttons - integrate with Switch controller, or even Skeltrack as a stretch goal
+ *     - Finish this stage and move to next stage:
+ *         - Save scaled image
+ *         - Save image coordinates by prepending them to points_list
+ *         - Clean up widgets
+ *         - Change title
+ *
+ * @author Dana Escandor
+ */
+
 #include <selector.h>
 #include <stdio.h>
 
@@ -175,6 +191,14 @@ static void load_and_set_image() {
 
         // Set the image in the image_display_area
         gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), preview_pixbuf);
+
+		// Set shrunken image in the image_pixbuf buffer
+		gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), image_pixbuf);
+		image_pixbuf = gdk_pixbuf_scale_simple(
+				image_pixbuf,
+				GRID_SIZE, GRID_SIZE,
+				GDK_INTERP_BILINEAR
+				);
     }
 }
 

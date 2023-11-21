@@ -34,13 +34,13 @@ void signal_router(GtkApplication *app,
 		activate_selector(app, NULL, data);
 	}
 	else if(strcmp(gtk_window_get_title(GTK_WINDOW(window)), TITLE_GCODER) == 0){
-		activate_gcoder(app, data);
+		activate_gcoder(app, NULL, data);
 	}
 	else if(strcmp(gtk_window_get_title(GTK_WINDOW(window)), TITLE_PLOTTER) == 0){
-		activate_plotter(app, data);
+		activate_plotter(app, NULL, data);
 	}
 	else {
-		activate_canvas(app, data);
+		activate_canvas(app, NULL, data);
 	}
 }
 
