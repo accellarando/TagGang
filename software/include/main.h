@@ -5,4 +5,13 @@
 #include <drawable_canvas.h>
 #include <selector.h>
 
+// Window title names
+#define TITLE_CANVAS "TagGang"
+#define TITLE_SELECTOR "Place your tag"
+#define TITLE_GCODER "Confirm"
+#define TITLE_PLOTTER "Plotting!"
+
+// Shared variables
+extern GtkWidget *window;
+
 #endif

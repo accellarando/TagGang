@@ -7,13 +7,45 @@ static double box_x = 0;
 static double box_y = 0;
 static double image_x = 0;
 static double image_y = 0;
-static char *image_file_path = NULL;
+static char *image_file_path = "drawing.png"; //hardcoded for now
 static GdkPixbuf *image_pixbuf = NULL;
 static GdkPixbuf *preview_pixbuf = NULL;
 static gboolean display_image = FALSE;  // Flag to control image display
 
-void activate_selector(GtkApplication *app, gpointer *data){
-	printf("Selector should be activated now.");
+
+static void load_and_set_image();
+static gboolean on_draw (GtkWidget *widget, cairo_t *cr, gpointer data);
+static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
+
+void activate_selector(  GObject* self,
+		GParamSpec* pspec,
+  gpointer user_data){
+	// printf("Selector should be active now.\n");
+	
+    // Create a vertical box to hold the drawing area and image display area
+    GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(window), vbox);
+
+    // Create drawing area
+    drawing_area = gtk_drawing_area_new();
+    gtk_widget_set_size_request(drawing_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+    gtk_box_pack_start(GTK_BOX(vbox), drawing_area, TRUE, TRUE, 0);
+
+    // Create image display area
+    image_display_area = gtk_image_new();
+    gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+    gtk_box_pack_start(GTK_BOX(vbox), image_display_area, TRUE, TRUE, 0);
+
+    // Load and set the image
+    load_and_set_image();
+
+    // Connect signals to callback functions
+    g_signal_connect(G_OBJECT(drawing_area), "draw", G_CALLBACK(on_draw), NULL);
+    g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press), NULL);
+
+    gtk_widget_set_events(window, GDK_KEY_PRESS_MASK);
+    gtk_widget_show_all(window);
+
 }
 
 /* Draws a selector box onto the drawing area (using Cairo API) */

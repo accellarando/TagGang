@@ -12,7 +12,7 @@
 
 cairo_surface_t  *surface		= NULL;
 GtkApplication	 *app			= NULL;
-static GtkWidget *window		= NULL;
+
 /***
  * This function clears the drawing off of the surface.
  */
@@ -144,9 +144,9 @@ static gboolean button_press_event_cb (GtkWidget      *widget,
 		if (surface)
 			cairo_surface_destroy (surface);
 		
-		// Emit a "done" notify signal to start the selector stage
-		// g_object_set_property(window, "done", TRUE);
-		gtk_window_set_title(window, "Place your tag");
+		// Change window title to next stage.
+		// This also triggers the signal router for you.
+		gtk_window_set_title(window, TITLE_SELECTOR);
 	}
 
 	/* We've handled the event, stop processing */

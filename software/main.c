@@ -23,29 +23,24 @@ void activate_gcoder(GtkApplication *app, gpointer data){
 void activate_plotter(GtkApplication *app, gpointer data){
 }
 
-int state = 0;
+
+/**
+ * This function routes Title Change signals to the appropriate
+ * function, based on the current state of the program.
+ */
 void signal_router(GtkApplication *app,
 		gpointer data){
-	//todo: typedef enum this guy
-	switch(state){
-		case 0: 
-			printf("Signal router hit! State: %d\n", state);
-			activate_selector(app, data);
-			state = 1;
-			break;
-		case 1:
-			activate_gcoder(app, data);
-			state = 2;
-			break;
-		case 2:
-			activate_plotter(app, data);
-			state = 3;
-			break;
-		case 3:
-			activate_canvas(app, data);
-			break;
-		default:
-			activate_canvas(app, data);
+	if(strcmp(gtk_window_get_title(GTK_WINDOW(window)), TITLE_SELECTOR) == 0){
+		activate_selector(app, NULL, data);
+	}
+	else if(strcmp(gtk_window_get_title(GTK_WINDOW(window)), TITLE_GCODER) == 0){
+		activate_gcoder(app, data);
+	}
+	else if(strcmp(gtk_window_get_title(GTK_WINDOW(window)), TITLE_PLOTTER) == 0){
+		activate_plotter(app, data);
+	}
+	else {
+		activate_canvas(app, data);
 	}
 }
 
@@ -53,16 +48,11 @@ void activate(GtkApplication *app,
 		gpointer data){
 	// Activate the drawing canvas with a callback to the next step
 	window = gtk_application_window_new (app);
-	gtk_window_set_title (GTK_WINDOW (window), "TagGang Main!");
+	gtk_window_set_title (GTK_WINDOW (window), "Draw a picture!");
+    gtk_widget_set_size_request(window, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	// Route signals that the child functions emit
-	g_signal_connect (window, "notify::title", G_CALLBACK(signal_router), window);
-	/** These don't work >:(
-	g_signal_connect (window, "canvas-done", G_CALLBACK(activate_selector), window); //reads file from directory
-	g_signal_connect (window, "selector-done", G_CALLBACK(activate_gcoder), points_list);
-	g_signal_connect (window, "gcode-done", G_CALLBACK(activate_plotter), NULL); 
-	g_signal_connect (window, "drawing_done", G_CALLBACK(activate_canvas), NULL);
-	*/
+	g_signal_connect (window, "notify::title", G_CALLBACK(signal_router), app);
 
 	// Start with the canvas
 	activate_canvas(app, window);
@@ -74,7 +64,7 @@ int main (int    argc,
 	GtkApplication *app;
 	int status;
 
-	app = gtk_application_new ("org.taggang.main", G_APPLICATION_FLAGS_NONE);
+	app = gtk_application_new ("org.taggang.main", G_APPLICATION_DEFAULT_FLAGS);
 
 	g_signal_connect (app, "activate", G_CALLBACK (activate), window);
 	status = g_application_run (G_APPLICATION (app), argc, argv);

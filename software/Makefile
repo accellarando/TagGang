@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = `pkg-config --cflags gtk+-x11-3.0`
+CFLAGS = -Og -g `pkg-config --cflags gtk+-x11-3.0`
 LIBS = `pkg-config --libs gtk+-x11-3.0`
 INCLUDES = include/
 SRC_SELECTOR = selector_v1.c
@@ -11,8 +11,8 @@ EXECUTABLE_MAIN = TagGang
 
 all: $(EXECUTABLE_MAIN)
 
-$(EXECUTABLE_MAIN): $(SRC_CANVAS) $(SRC_SELECTOR)
-	$(CC) $(CFLAGS) -o $@ $^ $(SRC_MAIN) -I$(INCLUDES) $(LIBS)
+$(EXECUTABLE_MAIN): $(SRC_CANVAS) $(SRC_SELECTOR) $(SRC_MAIN)
+	$(CC) $(CFLAGS) -o $@ $^ -I$(INCLUDES) $(LIBS)
 
 $(EXECUTABLE_SELECTOR): $(SRC_SELECTOR)
 	$(CC) $(CFLAGS) -o $@ $^ -I$(INCLUDES) $(LIBS)
