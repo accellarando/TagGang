@@ -17,10 +17,10 @@ void scale_point_cloud(GtkApplication *app,
 	GList* paths = (GList*) data;
 }
 
-void activate_gcoder(GtkApplication *app, gpointer data){
+void activate_gcoder(GtkApplication *app, void* hi, gpointer data){
 }
 
-void activate_plotter(GtkApplication *app, gpointer data){
+void activate_plotter(GtkApplication *app, void* hi, gpointer data){
 }
 
 
@@ -55,7 +55,7 @@ void activate(GtkApplication *app,
 	g_signal_connect (window, "notify::title", G_CALLBACK(signal_router), app);
 
 	// Start with the canvas
-	activate_canvas(app, window);
+	activate_canvas(app, NULL, window);
 }
 
 int main (int    argc,
@@ -64,7 +64,7 @@ int main (int    argc,
 	GtkApplication *app;
 	int status;
 
-	app = gtk_application_new ("org.taggang.main", G_APPLICATION_DEFAULT_FLAGS);
+	app = gtk_application_new ("org.taggang.main", G_APPLICATION_FLAGS_NONE);
 
 	g_signal_connect (app, "activate", G_CALLBACK (activate), window);
 	status = g_application_run (G_APPLICATION (app), argc, argv);

@@ -1,12 +1,17 @@
 /**
  * This file contains code to generate G-Code from a list of points.
  *
+ * TODO:
+ *		- Loading bar? (stretch goal)
+ *		- Testing
+ *		- Figure out x_scale and y_scale for scale_paths, or implement a different strategy
+ *
  * @author Ella Moss
  */
 
 #include <gcode.h>
 
-void paths_to_gcode_file(GList* points, char* filename){
+void paths_to_gcode_file_cartesian(GList* points, char* filename){
 	FILE* file = fopen(filename, "w");
 	if (file == NULL) {
 		printf("Error opening file!\n");
@@ -63,7 +68,7 @@ void activate_gcoder(GObject* self,
 	// todo: put a loading bar here that lets you keep track of progress
 	scale_paths(points_list, 10, 10);
 
-	paths_to_gcode_file(points_list, "output.gcode");
+	paths_to_gcode_file_cartesian(points_list, "output.gcode");
 
 	finish_stage();
 }

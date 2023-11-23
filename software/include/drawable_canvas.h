@@ -11,8 +11,7 @@ typedef struct {
 	gdouble y;
 } DoublePoint;
 
-void activate_canvas (GtkApplication* app, 
-		gpointer user_data);
+void activate_canvas (GtkApplication* app, void* i_forgot, gpointer user_data);
 
 extern GList* points_list;
 #endif

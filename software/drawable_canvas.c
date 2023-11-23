@@ -6,6 +6,9 @@
  *
  * Code sample starting point from https://docs.gtk.org/gtk3/getting_started.html#custom-drawing
  *
+ * todo:
+ * Make BUTTON_ERASE work to undo last path
+ *
  * @author Ella Moss
  */
 #include <drawable_canvas.h>
@@ -65,6 +68,9 @@ static gboolean draw_cb (GtkWidget *widget,
 
 /* This list contains all the points so that when they're ready to move on,
  * you can draw them all at once.
+ * points_list:
+ * { { {0,0}, {0,1}, ...},
+ *	 { {5, 6}, {7,8} ...}}
  */
 GList* points_list = NULL;
 GList* current_path = NULL;
@@ -205,6 +211,7 @@ static void close_window (void)
 }
 
 void activate_canvas (GtkApplication *app,
+		void*		i_forgot,
 		gpointer	 user_data)
 {
 	window = (GtkWidget*) user_data;
