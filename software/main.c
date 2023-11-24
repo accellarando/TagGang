@@ -17,9 +17,6 @@ void scale_point_cloud(GtkApplication *app,
 	GList* paths = (GList*) data;
 }
 
-void activate_gcoder(GtkApplication *app, void* hi, gpointer data){
-}
-
 void activate_plotter(GtkApplication *app, void* hi, gpointer data){
 }
 

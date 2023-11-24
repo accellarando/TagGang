@@ -121,6 +121,7 @@ static void draw_brush (GtkWidget *widget,
  * The ::button-press signal handler receives a GdkEventButton
  * struct which contains this information.
  */
+
 #define BUTTON_PEN_DOWN GDK_BUTTON_PRIMARY
 #define BUTTON_ERASE GDK_BUTTON_SECONDARY
 #define BUTTON_SAVE GDK_BUTTON_MIDDLE

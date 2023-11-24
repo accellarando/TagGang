@@ -6,7 +6,6 @@
  *     - Support state, ie render previous images in their locations (save entire thing to png maybe?)
  *     - Buttons - integrate with Switch controller, or even Skeltrack as a stretch goal
  *     - Finish this stage and move to next stage: (see drawable_canvas for examples)
- *         - Save scaled image (? save current state i guess?)
  *         - Save image coordinates by prepending them to points_list
  *         - Clean up widgets
  *         - Change title
@@ -19,6 +18,7 @@
 
 static GtkWidget *drawing_area;
 static GtkWidget *image_display_area; // GtkImage widget for displaying the loaded image
+static GtkWidget *vbox;
 static double box_x = 0;
 static double box_y = 0;
 static double image_x = 0;
@@ -39,7 +39,7 @@ void activate_selector(  GObject* self,
 	// printf("Selector should be active now.\n");
 	
     // Create a vertical box to hold the drawing area and image display area
-    GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
     // Create drawing area
@@ -127,6 +127,24 @@ static void send_coordinates() {
     g_print("Box Coordinates: (%.0f, %.0f)\n", box_x, box_y);
 }
 
+static void save_coordinates(double x, double y) {
+	g_print("Box Coordinates: (%.0f, %.0f)\n", x, y);
+	DoublePoint* p = malloc(sizeof(DoublePoint));
+	p->x = x;
+	p->y = y;
+	points_list = g_list_prepend(points_list, p);
+}
+
+static void finish_selector_stage() {
+	// Clean up widgets
+	gtk_widget_destroy(drawing_area);
+	gtk_widget_destroy(image_display_area);
+	gtk_widget_destroy(vbox);
+
+	// Change window title
+	gtk_window_set_title(GTK_WINDOW(window), TITLE_GCODER);
+}
+
 /* Callback function for the "key-press-event" signal */
 static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
     // Handle arrow key events to move the box in snapping intervals
@@ -144,10 +162,9 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
             move_box(SNAP_INTERVAL, 0);
             break;
         case GDK_KEY_Return:
-            //send_coordinates();
-
             if (display_image) {
-                // Shrink the image to the size of the selector box
+                // Shrink the image to the size of the selector box - not anymore, now do one-shot
+				/*
                 GdkPixbuf *shrunken_pixbuf = gdk_pixbuf_scale_simple(
                     image_pixbuf,
                     GRID_SIZE, GRID_SIZE,
@@ -156,6 +173,12 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
 
                 g_object_unref(image_pixbuf);
                 image_pixbuf = shrunken_pixbuf;
+				*/
+
+				// Finish up
+				save_coordinates(box_x, box_y);
+				finish_selector_stage();
+				return;
             }
 
             image_x = box_x;
