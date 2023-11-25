@@ -22,4 +22,6 @@
 #define PIN_R_STEP		PIN_TO_NUMBER(PD6)
 #define PIN_R_NHOME		PIN_TO_NUMBER(PC1)
 
+#define PIN_PEN_SERVO   PIN_TO_NUMBER(PB1)
+
 #endif
