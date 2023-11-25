@@ -2,6 +2,7 @@
  * This file contains code to generate G-Code from a list of points.
  *
  * TODO:
+ * 		- Coordinate transformation
  *		- Testing
  *		- Figure out x_scale and y_scale for scale_paths, or implement a different strategy
  *		- Loading bar? (stretch goal)
@@ -9,6 +10,17 @@
  * @author Ella Moss
  */
 
+/**
+ * points_list is in this format:
+ * { {{box_corner_X, box_corner_Y}},
+ *   { {path_point_1_X, path_point_1_Y},
+ *     ...
+ *   },
+ *   { {path_point_X, path_point_Y},
+ *   ...
+ *   }
+ * }
+ */
 #include <gcode.h>
 
 void paths_to_gcode_file_cartesian(GList* points, char* filename){

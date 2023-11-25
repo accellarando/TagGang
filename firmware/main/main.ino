@@ -14,7 +14,7 @@
  * TODO: 
  *  - Implement homing procedure (G28)
  *  - Bounds checking on requested coordinates (ie no negative coordinates please)
- *  - Figure out dimensions of canvas, belt, homing position, etc
+ *  	- Figure out dimensions of canvas, belt, homing position, etc
  *
  * References some source code from https://github.com/euphy/polargraph_server_a1/.
  */
@@ -25,6 +25,9 @@
 
 #include "pins.h"
 
+/**
+ * Enum that lists the different command types supported by the firmware.
+ */
 typedef enum{
 	CMD_G1LR,
 	CMD_G1Z,
@@ -33,9 +36,12 @@ typedef enum{
 
 Servo penServo;
 
-  AccelStepper motorL(AccelStepper::FULL4WIRE, PIN_L_STEP, PIN_L_DIR);
-  AccelStepper motorR(AccelStepper::FULL4WIRE, PIN_L_STEP, PIN_R_STEP); 
-  
+AccelStepper motorL(AccelStepper::FULL4WIRE, PIN_L_STEP, PIN_L_DIR);
+AccelStepper motorR(AccelStepper::FULL4WIRE, PIN_L_STEP, PIN_R_STEP); 
+
+/**
+ * Directions or angles may be wrong in either of these functions.
+ */
 int pen_down(){
 	penServo.attach(PIN_PEN_SERVO);
 	for(int i=0; i<180; i++){
@@ -44,7 +50,6 @@ int pen_down(){
 	}
 	penServo.detach();
 }
-
 int pen_up(){
 	penServo.attach(PIN_PEN_SERVO);
 	for(int i=180; i>0; i--){
@@ -54,7 +59,10 @@ int pen_up(){
 	penServo.detach();
 }
 
-#define MM_PER_STEP 0.1 // read belt datasheet?
+#define GEAR_RADIUS 8.0 //mm
+#define DEGREES_PER_STEP 1.8
+#define PI 3.1415926
+#define MM_PER_STEP ((PI * GEAR_RADIUS * DEGREES_PER_STEP) / 180.0)
 int move_motors(double l, double r){
 	// Convert l and r to motor steps
 	int lSteps = l / MM_PER_STEP;
@@ -66,9 +74,14 @@ int move_motors(double l, double r){
 	motorR.moveTo(rSteps);
 }
 
+/**
+ * Comment out the DRY_RUN macro to actually send commands to motors.
+ * Otherwise, it will print out the command contents to the serial
+ * terminal for debugging.
+ */
 #define DRY_RUN 1 
 int send_command(CommandType cmdType, double lz, double r){
-#if defined(DRY_RUN) && !DRY_RUN
+#if defined(DRY_RUN) && DRY_RUN
 	char buffer[10];
 	sprintf(buffer, "%d %f %f", cmdType, lz, r);
 	Serial.println(buffer);
@@ -94,11 +107,8 @@ int send_command(CommandType cmdType, double lz, double r){
 }
 
 /**
- * this little guy is kind of quirky. i was crossfaded when i wrote it but i
- * think it'll get the job done.
- *
- * Each G1LR coordinate must be in the order X%f Y%f
- * and the Y coordinate must be terminated with a \n or a space.
+ * Each G1LR coordinate must be in the order L%f R%f
+ * and the R coordinate must be terminated with a \n or a space.
  * 
  * Supports the commands listed in the file's top comment. go read that one.
  */
@@ -108,19 +118,19 @@ int exec_command(String cmd){
 	if(cmd[0] != 'G'){
 		return 1; // not supported
 	}
-  Serial.println(cmd[1] == '1');
+	Serial.println(cmd[1] == '1');
 	switch(cmd[1]){
 		case '1':
 			if(cmd[3] == 'L'){
 				// get parsin
 				int strPos = 4;
-        int i = 0;
+				int i = 0;
 				for(int j=0; j<2; j++){
 					char point[10];
 					while(cmd[strPos] != ' ' && cmd[strPos] != '\n'){
 						point[i] = cmd[strPos];
 						strPos++;
-           i++;
+						i++;
 					}
 					points[j] = atoi(point);
 					strPos += 2; //skip the space and letter if applicable
@@ -130,18 +140,18 @@ int exec_command(String cmd){
 			else if(cmd[3] == 'Z'){
 				char amt[10];
 				int strPos = 4;
-        int i = 0;
+				int i = 0;
 				while(cmd[strPos] != ' ' && cmd[strPos] != '\n'){
 					amt[i] = cmd[strPos];
 					strPos++;
-          i++;
+					i++;
 				}
 				return send_command(CMD_G1Z, atoi(amt), -1);
 			}
 			else{
 				return 2; // not supported
 			}
-		break;
+			break;
 		case '2':
 			if(cmd[2] == '8')
 				return send_command(CMD_G28, -1, -1);
@@ -173,18 +183,21 @@ void setup_motors(){
 
 }
 
+/**
+ * Set up motors and pins, then send OK when read
+*/
 void setup(){
 	Serial.begin(9600); // Start serial communication at 9600 baud
 	Serial.println("Loading TagGang firmware!");
 
-    setup_motors();
+	setup_motors();
 
 	Serial.println("OK");
 }
 
 void loop(){
-	String cmd = Serial.readStringUntil('\n');
-  Serial.println(cmd);
+	String cmd = Serial.readStringUntil('\n'); // quirk: the string has to have a space before \n for some reason?
+	Serial.println(cmd); // for debug
 	int err = exec_command(cmd);
 	if(!err){
 		Serial.println("OK");
