@@ -11,6 +11,8 @@
 #define TITLE_GCODER "Confirm"
 #define TITLE_PLOTTER "Plotting!"
 
+#define MOTOR_DISTANCE 60
+
 // Shared variables
 extern GtkWidget *window;
 

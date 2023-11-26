@@ -2,7 +2,6 @@
  * This file contains code to generate G-Code from a list of points.
  *
  * TODO:
- * 		- Coordinate transformation
  *		- Testing
  *		- Figure out x_scale and y_scale for scale_paths, or implement a different strategy
  *		- Loading bar? (stretch goal)
@@ -58,8 +57,8 @@ void scale_paths(GList* points, double x_factor, double y_factor) {
 	GList* current = points;
 	// First path contains the starting coordinate
 	GList *first_path = ((GList*) current->data);
-	gdouble start_x = ((DoublePoint*) first_path)->x;
-	gdouble start_y = ((DoublePoint*) first_path)->y;
+	gdouble start_x = ((DoublePoint*) (first_path->data))->x;
+	gdouble start_y = ((DoublePoint*) (first_path->data))->y;
 	current = current->next;
 
 	while (current != NULL) {
@@ -76,18 +75,43 @@ void scale_paths(GList* points, double x_factor, double y_factor) {
 	}
 }
 
+void transform_paths(GList* points, double motor_distance){
+	GList* current = points;
+	while(current != NULL){
+		GList *this_path = ((GList*) current->data);
+		while(this_path != NULL){
+			DoublePoint* point = (DoublePoint*) this_path->data;
+			gdouble original_x = point->x;
+			gdouble original_y = point->y;
+			point->x = sqrt(pow(original_x,2) + pow(original_y,2));
+			point->y = sqrt(pow((motor_distance - original_x),2) + pow(original_y,2));
+			this_path = this_path->next;
+		}
+		current = current->next;
+	}
+}
+
+GtkWidget *label;
+
+void finish_stage() {
+	gtk_widget_destroy(label);
+
+	gtk_window_set_title(GTK_WINDOW(window), TITLE_PLOTTER);
+}
 
 void activate_gcoder(GObject* self,
 		GParamSpec* property, gpointer data) {
 
 	// todo: put a loading bar here that lets you keep track of progress. For now, just put some placeholder text.
-	GtkWidget *label = gtk_label_new("Generating gcode!");
+	label = gtk_label_new("Generating gcode!");
     gtk_container_add(GTK_CONTAINER(window), label);
     gtk_widget_show_all(window);
 
 	scale_paths(points_list, 10, 10);
 
+	transform_paths(points_list, MOTOR_DISTANCE);
+
 	paths_to_gcode_file_cartesian(points_list, "output.gcode");
 
-	//finish_stage();
+	finish_stage();
 }

@@ -61,7 +61,6 @@ int pen_up(){
 
 #define GEAR_RADIUS 8.0 //mm
 #define DEGREES_PER_STEP 1.8
-#define PI 3.1415926
 #define MM_PER_STEP ((PI * GEAR_RADIUS * DEGREES_PER_STEP) / 180.0)
 int move_motors(double l, double r){
 	// Convert l and r to motor steps
@@ -186,6 +185,7 @@ void setup_motors(){
 /**
  * Set up motors and pins, then send OK when read
 */
+int i;
 void setup(){
 	Serial.begin(9600); // Start serial communication at 9600 baud
 	Serial.println("Loading TagGang firmware!");
@@ -193,6 +193,7 @@ void setup(){
 	setup_motors();
 
 	Serial.println("OK");
+ i = 0;
 }
 
 void loop(){
@@ -207,8 +208,22 @@ void loop(){
 		sprintf(response, "E%03d", err);
 		Serial.println(response);
 	}
+  /*
+  move_motors(20.0+i, 20.0+i);
+  motorL.run();
+  motorR.run();
 	while(motorL.distanceToGo() != 0 || motorR.distanceToGo() != 0){
 		motorL.run();
 		motorR.run();
 	}
+ */
+ for(int x=0; x<800; x++){
+    digitalWrite(PIN_L_STEP, HIGH);
+    digitalWrite(PIN_R_STEP, HIGH);
+    delayMicroseconds(700);
+    digitalWrite(PIN_L_STEP, LOW);
+    digitalWrite(PIN_R_STEP, LOW);
+    delayMicroseconds(700);
+ 
+ }
 }

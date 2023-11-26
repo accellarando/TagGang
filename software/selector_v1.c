@@ -127,19 +127,27 @@ static void send_coordinates() {
     g_print("Box Coordinates: (%.0f, %.0f)\n", box_x, box_y);
 }
 
+static GList* point_path = NULL;
 static void save_coordinates(double x, double y) {
 	g_print("Box Coordinates: (%.0f, %.0f)\n", x, y);
+
 	DoublePoint* p = malloc(sizeof(DoublePoint));
+
 	p->x = x;
 	p->y = y;
-	points_list = g_list_prepend(points_list, p);
+
+	point_path = g_list_append(point_path, p);
+	points_list = g_list_prepend(points_list, point_path);
 }
 
 static void finish_selector_stage() {
 	// Clean up widgets
+	gtk_widget_destroy(vbox);
 	gtk_widget_destroy(drawing_area);
 	gtk_widget_destroy(image_display_area);
-	gtk_widget_destroy(vbox);
+
+	// Disconnect signal handler for keypress
+	g_signal_handlers_disconnect_by_func(window, G_CALLBACK(on_key_press), NULL);
 
 	// Change window title
 	gtk_window_set_title(GTK_WINDOW(window), TITLE_GCODER);

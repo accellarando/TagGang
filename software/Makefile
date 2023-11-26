@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Og -g `pkg-config --cflags gtk+-x11-3.0`
-LIBS = `pkg-config --libs gtk+-x11-3.0`
+LIBS = `pkg-config --libs gtk+-x11-3.0` -lm
 INCLUDES = include/
 SRC_SELECTOR = selector_v1.c
 SRC_CANVAS = drawable_canvas.c
