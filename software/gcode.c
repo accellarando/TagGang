@@ -22,7 +22,7 @@
  */
 #include <gcode.h>
 
-void paths_to_gcode_file_cartesian(GList* points, char* filename){
+void paths_to_gcode_file(GList* points, char* filename){
 	FILE* file = fopen(filename, "w");
 	if (file == NULL) {
 		printf("Error opening file!\n");
@@ -36,17 +36,19 @@ void paths_to_gcode_file_cartesian(GList* points, char* filename){
 		GList* current_point = ((GList*) current_path->data);
 		DoublePoint* start_point = (DoublePoint*) current_point->data;
 		// Move pen to start point
-		fprintf(file, "G1 X%f Y%f\n", start_point->x, start_point->y);
+		// These were already transformed in transform_paths
+		fprintf(file, "G1 L%f R%f\n", start_point->x, start_point->y);
 		// Move pen down 
 		fprintf(file, "G1 Z%f\n", 0.0); 
 		current_point = current_point->next;
 		while (current_point != NULL) {
 			DoublePoint* point = (DoublePoint*) current_point->data;
-			fprintf(file, "G1 X%f Y%f\n", point->x, point->y);
+			fprintf(file, "G1 L%f R%f\n", point->x, point->y);
 			current_point = current_point->next;
 		}
 		// Move pen up
-		fprintf(file, "G1 Z%f\n", 10.0);
+		fprintf(file, "G1 Z%f\n", 180.0); // maybe in the future we want to take a degree parameter
+										  // for the servo angle?
 		current_path = current_path->next;
 	}
 
@@ -111,7 +113,7 @@ void activate_gcoder(GObject* self,
 
 	transform_paths(points_list, MOTOR_DISTANCE);
 
-	paths_to_gcode_file_cartesian(points_list, "output.gcode");
+	paths_to_gcode_file(points_list, "output.gcode");
 
 	finish_stage();
 }
