@@ -190,9 +190,9 @@ void setup(){
 	Serial.begin(9600); // Start serial communication at 9600 baud
 	Serial.println("Loading TagGang firmware!");
 
-	setup_motors();
+	//setup_motors();
 
-	Serial.println("OK");
+	Serial.println("SETUP DONE");
 }
 
 void loop(){
