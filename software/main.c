@@ -17,10 +17,6 @@ void scale_point_cloud(GtkApplication *app,
 	GList* paths = (GList*) data;
 }
 
-void activate_plotter(GtkApplication *app, void* hi, gpointer data){
-}
-
-
 /**
  * This function routes Title Change signals to the appropriate
  * function, based on the current state of the program.

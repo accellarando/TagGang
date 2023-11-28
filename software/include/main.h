@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 #include <drawable_canvas.h>
 #include <selector.h>
+#include <send_commands.h>
 
 // Window title names
 #define TITLE_CANVAS "TagGang"
