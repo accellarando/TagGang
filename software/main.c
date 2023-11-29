@@ -144,7 +144,7 @@ static void on_track_joints (GObject      *obj,
 
 	g_slice_free (BufferInfo, buffer_info);
 
-	skeltrack_joint_list_free (joints_list); // or do we want to do this later...
+	//skeltrack_joint_list_free (joints_list); // or do we want to do this later...
 }
 
 static void on_depth_frame (GFreenectDevice *dev, gpointer data){
@@ -185,7 +185,7 @@ static void on_depth_frame (GFreenectDevice *dev, gpointer data){
 
 	// then, in the draw handler on drawable canvas, it will
 	// draw relevant joints and process them. this sends a new
-	// draw signal
+	// draw signal hopefully
 	if(drawing_area != NULL){
 		gtk_widget_queue_draw_area(drawing_area, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	}

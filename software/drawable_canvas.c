@@ -56,27 +56,27 @@ static gboolean configure_event_cb (GtkWidget         *widget,
  * signal receives a ready-to-be-used cairo_t that is already
  * clipped to only draw the exposed areas of the widget
  */
-SkeltrackJointList* joints_list;
+SkeltrackJointList joints_list;
 static gboolean draw_cb (GtkWidget *widget,
 		cairo_t   *cr,
 		gpointer   data)
 {
-	GAsyncResult *res = NULL;
-	GError *error = NULL;
-
-	if(error == NULL){
-		SkeltrackJoint *right_hand = skeltrack_joint_list_get_joint(joints_list, SKELTRACK_JOINT_ID_RIGHT_HAND);
-		// Paint right hand on canvas as a circle
-		cairo_set_source_rgb(cr, 0, 0, 0);
-		cairo_arc(cr, right_hand->x, right_hand->y, 10, 0, 2 * G_PI);
-		cairo_fill(cr);
-	}
-
-	skeltrack_joint_list_free(joints_list);
-
 	cairo_set_source_surface (cr, surface, 0, 0);
 	cairo_paint (cr);
 
+	GAsyncResult *res = NULL;
+	GError *error = NULL;
+
+	if(error == NULL && joints_list != NULL){
+		SkeltrackJoint *right_hand = skeltrack_joint_list_get_joint(joints_list, SKELTRACK_JOINT_ID_RIGHT_HAND);
+		if(right_hand != NULL){
+			// Paint right hand on canvas as a circle
+			cairo_set_source_rgb(cr, 1, 0, 0);
+			cairo_arc(cr, WINDOW_WIDTH - right_hand->screen_x, right_hand->screen_y, 10, 0, 2 * G_PI);
+			cairo_fill(cr);
+		}
+		//skeltrack_joint_list_free(joints_list); //this segfaults sometimes???? idk.
+	}
 	return FALSE;
 }
 

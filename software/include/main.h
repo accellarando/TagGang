@@ -17,8 +17,8 @@
 
 #define MOTOR_DISTANCE 60
 
-#define THRESHOLD_BEGIN 4 // put the actual value here
-#define THRESHOLD_END 10 // put the actual value here
+#define THRESHOLD_BEGIN 500
+#define THRESHOLD_END 1500 
 
 // Shared variables
 extern GtkWidget *window;
