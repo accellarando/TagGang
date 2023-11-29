@@ -118,7 +118,7 @@ static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
 		last_joy_time = g_get_monotonic_time();
 	}
 	// Check if we need to finish selector stage
-	if(event.type == JS_EVENT_BUTTON && event.number == BTN_RIGHT_Y && event.value == 1){
+	if(btn_available == 1 && event.type == JS_EVENT_BUTTON && event.number == BTN_RIGHT_Y && event.value == 1){
 		// Finish up
 		if(last_joy_time != 0){
 			save_coordinates(box_x, box_y);

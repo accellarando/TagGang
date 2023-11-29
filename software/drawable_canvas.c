@@ -117,6 +117,7 @@ static gboolean draw_cb (GtkWidget *widget,
 			advance_stage();
 		}
 	}
+	btn_available = 0;
 
 	if(error == NULL && joints_list != NULL){
 		SkeltrackJoint *right_hand = skeltrack_joint_list_get_joint(joints_list, SKELTRACK_JOINT_ID_RIGHT_HAND);
