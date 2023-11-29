@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 #include <math.h>
 #include <main.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 
 
 /* Global variables */

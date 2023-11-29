@@ -171,17 +171,6 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
             break;
         case GDK_KEY_Return:
             if (display_image) {
-                // Shrink the image to the size of the selector box - not anymore, now do one-shot
-				/*
-                GdkPixbuf *shrunken_pixbuf = gdk_pixbuf_scale_simple(
-                    image_pixbuf,
-                    GRID_SIZE, GRID_SIZE,
-                    GDK_INTERP_BILINEAR
-                );
-
-                g_object_unref(image_pixbuf);
-                image_pixbuf = shrunken_pixbuf;
-				*/
 
 				// Finish up
 				save_coordinates(box_x, box_y);
@@ -233,48 +222,3 @@ static void load_and_set_image() {
     }
 }
 
-/*
-int main(int argc, char *argv[]) {
-    gtk_init(&argc, &argv);
-
-    if (argc != 2) {
-        g_print("Error: Please provide an image file path\n");
-        return -1;
-    }
-
-    image_file_path = argv[1];
-
-    // Create window
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "Snapping Box");
-    gtk_window_set_default_size(GTK_WINDOW(window), WINDOW_WIDTH, WINDOW_HEIGHT);
-
-    // Create a vertical box to hold the drawing area and image display area
-    GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_container_add(GTK_CONTAINER(window), vbox);
-
-    // Create drawing area
-    drawing_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(drawing_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
-    gtk_box_pack_start(GTK_BOX(vbox), drawing_area, TRUE, TRUE, 0);
-
-    // Create image display area
-    image_display_area = gtk_image_new();
-    gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
-    gtk_box_pack_start(GTK_BOX(vbox), image_display_area, TRUE, TRUE, 0);
-
-    // Load and set the image
-    load_and_set_image();
-
-    // Connect signals to callback functions
-    g_signal_connect(G_OBJECT(drawing_area), "draw", G_CALLBACK(on_draw), NULL);
-    g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press), NULL);
-
-    gtk_widget_set_events(window, GDK_KEY_PRESS_MASK);
-    gtk_widget_show_all(window);
-
-    gtk_main();
-
-    return 0;
-}
-*/
