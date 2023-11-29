@@ -14,8 +14,10 @@
 // Global/shared variables
 // GtkApplication *app;
 GtkWidget *window;
+// these are declared in the header file as extern but idk if we actually want to share them?
 GFreenectDevice *kinect = NULL; 
 SkeltrackSkeleton *skeleton = NULL;
+gint smoothing_factor = 1;
 
 void scale_point_cloud(GtkApplication *app,
 		gpointer data){
@@ -124,7 +126,7 @@ static void on_track_joints (GObject      *obj,
 	reduced_width = buffer_info->reduced_width;
 	reduced_height = buffer_info->reduced_height;
 
-	list = skeltrack_skeleton_track_joints_finish (skeleton,
+	joints_list = skeltrack_skeleton_track_joints_finish (skeleton,
 			res,
 			&error);
 
@@ -142,7 +144,7 @@ static void on_track_joints (GObject      *obj,
 
 	g_slice_free (BufferInfo, buffer_info);
 
-	skeltrack_joint_list_free (list);
+	skeltrack_joint_list_free (joints_list); // or do we want to do this later...
 }
 
 static void on_depth_frame (GFreenectDevice *dev, gpointer data){
@@ -155,7 +157,6 @@ static void on_depth_frame (GFreenectDevice *dev, gpointer data){
 	gsize len;
 	GError *error = NULL;
 	GFreenectFrameMode frame_mode;
-	ClutterContent *content;
 
 	depth = (guint16 *) gfreenect_device_get_depth_frame_raw (dev,
 			&len,
@@ -173,6 +174,7 @@ static void on_depth_frame (GFreenectDevice *dev, gpointer data){
 			THRESHOLD_BEGIN,
 			THRESHOLD_END);
 
+	// This saves joints into the skeleton object i think
 	skeltrack_skeleton_track_joints (skeleton,
 			buffer_info->reduced_buffer,
 			buffer_info->reduced_width,
@@ -180,6 +182,13 @@ static void on_depth_frame (GFreenectDevice *dev, gpointer data){
 			NULL,
 			on_track_joints,
 			buffer_info);
+
+	// then, in the draw handler on drawable canvas, it will
+	// draw relevant joints and process them. this sends a new
+	// draw signal
+	if(drawing_area != NULL){
+		gtk_widget_queue_draw_area(drawing_area, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	}
 }
 
 static void on_video_frame (GFreenectDevice *kinect, gpointer user_data)

@@ -16,7 +16,7 @@
 #include <selector.h>
 #include <stdio.h>
 
-static GtkWidget *drawing_area;
+//static GtkWidget *drawing_area;
 static GtkWidget *image_display_area; // GtkImage widget for displaying the loaded image
 static GtkWidget *vbox;
 static double box_x = 0;

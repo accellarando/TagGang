@@ -17,6 +17,9 @@
 
 #define MOTOR_DISTANCE 60
 
+#define THRESHOLD_BEGIN 4 // put the actual value here
+#define THRESHOLD_END 10 // put the actual value here
+
 // Shared variables
 extern GtkWidget *window;
 extern GFreenectDevice *kinect;
