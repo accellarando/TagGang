@@ -5,6 +5,7 @@
 #include <math.h>
 #include <main.h>
 #include <skeltrack.h>
+#include <linux/joystick.h>
 
 // Point structure
 typedef struct {

@@ -10,6 +10,11 @@
  * https://github.com/joaquimrocha/Skeltrack/blob/master/examples/test-kinect.c
  */
 #include <main.h>
+#include <fcntl.h>
+#include <linux/joystick.h>
+#include <libudev.h>
+#include <gio/gio.h>
+#include <string.h>
 
 // Global/shared variables
 // GtkApplication *app;
@@ -17,7 +22,7 @@ GtkWidget *window;
 // these are declared in the header file as extern but idk if we actually want to share them?
 GFreenectDevice *kinect = NULL; 
 SkeltrackSkeleton *skeleton = NULL;
-gint smoothing_factor = 1;
+gfloat smoothing_factor = 0.5;
 
 void scale_point_cloud(GtkApplication *app,
 		gpointer data){
@@ -225,7 +230,7 @@ static void on_new_kinect(GObject *obj,
 			G_CALLBACK (on_video_frame),
 			NULL);
 
-	gfreenect_device_set_tilt_angle(kinect, 0, NULL, NULL, NULL);
+	//gfreenect_device_set_tilt_angle(kinect, 0, NULL, NULL, NULL);
 	gfreenect_device_start_depth_stream(kinect, 
 			GFREENECT_DEPTH_FORMAT_MM, 
 			NULL);
@@ -233,6 +238,70 @@ static void on_new_kinect(GObject *obj,
 			GFREENECT_RESOLUTION_MEDIUM,
 			GFREENECT_VIDEO_FORMAT_RGB,
 			NULL);
+}
+
+/**
+ * Reads a joystick event from the joystick device.
+ *
+ * https://gist.github.com/jasonwhite/c5b2048c15993d285130
+ *
+ * Returns 0 on success. Otherwise -1 is returned.
+ */
+int read_event(int fd, struct js_event *event)
+{
+    ssize_t bytes;
+
+    bytes = read(fd, event, sizeof(*event));
+
+    if (bytes == sizeof(*event))
+        return 0;
+
+    /* Error, could not read full event. */
+    return -1;
+}
+
+// do we want a queue here?
+volatile int joy_available = 0;
+volatile int joy_x = 0;
+volatile int joy_y = 0;
+volatile int btn_available = 0;
+volatile struct js_event event;
+
+gboolean check_for_js_events(gpointer data){
+	int joystick_fd = *((int*)data);
+	if(read_event(joystick_fd, &event) == 0){
+		//g_print("Joystick event! type: %d, number: %d, value: %d\n", event.type, event.number, event.value);
+		if(event.type == JS_EVENT_BUTTON){
+			btn_available = 1;
+		}
+		else if(event.type == JS_EVENT_AXIS){
+			joy_available = 1;
+			// convert this to a keypress
+			if(event.number == JOY_RIGHT_X){
+				if(event.value > DEADZONE){
+					joy_x = 1;
+				}
+				else if(event.value < -DEADZONE){
+					joy_x = -1;
+				}
+				else{
+					joy_x = 0;
+				}
+			}
+			if(event.number == JOY_RIGHT_Y){
+				if(event.value > DEADZONE){
+					joy_y = 1; //down
+				}
+				else if(event.value < -DEADZONE){
+					joy_y = -1;
+				}
+				else{
+					joy_y = 0;
+				}
+			}
+		}
+	}
+	return G_SOURCE_CONTINUE;
 }
 
 int main (int    argc,
@@ -249,11 +318,18 @@ int main (int    argc,
 			NULL,
 			on_new_kinect,
 			NULL);
+	// Setup joystick
+	//setup_joysticks(); // This doesn't work for some reason, poll instead:
+	int joystick_fd = open("/dev/input/js0", O_RDONLY | O_NONBLOCK);
+	g_timeout_add(JOY_POLL_PERIOD, check_for_js_events, &joystick_fd);
 
 	// Set up activation signal handler
 	g_signal_connect (app, "activate", G_CALLBACK (activate), window);
+
 	status = g_application_run (G_APPLICATION (app), argc, argv);
+
 	g_object_unref (app);
+	close(joystick_fd);
 
 	return status;
 }

@@ -34,6 +34,10 @@ void paths_to_gcode_file(GList* points, char* filename){
 	current_path = current_path->next;
 	while (current_path != NULL) {
 		GList* current_point = ((GList*) current_path->data);
+		if(current_point == NULL){
+			current_path = current_path->next;
+			continue;
+		}
 		DoublePoint* start_point = (DoublePoint*) current_point->data;
 		// Move pen to start point
 		// These were already transformed in transform_paths

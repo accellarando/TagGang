@@ -28,10 +28,11 @@ static GdkPixbuf *image_pixbuf = NULL;
 static GdkPixbuf *preview_pixbuf = NULL;
 static gboolean display_image = FALSE;  // Flag to control image display
 
-
 static void load_and_set_image();
 static gboolean on_draw (GtkWidget *widget, cairo_t *cr, gpointer data);
 static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
+static void finish_selector_stage();
+static void save_coordinates(double x, double y);
 
 void activate_selector(  GObject* self,
 		GParamSpec* pspec,
@@ -61,7 +62,6 @@ void activate_selector(  GObject* self,
 
     gtk_widget_set_events(window, GDK_KEY_PRESS_MASK);
     gtk_widget_show_all(window);
-
 }
 
 /* Draws a selector box onto the drawing area (using Cairo API) */
@@ -111,7 +111,22 @@ static void move_box(double dx, double dy) {
 }
 
 /* Callback function for the "draw" signal */
+static gdouble last_joy_time = 0;
 static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
+	if(last_joy_time == 0 || (g_get_monotonic_time() - last_joy_time) > 1000000/JOY_SPEED){
+		move_box(joy_x*SNAP_INTERVAL, joy_y*SNAP_INTERVAL);
+		last_joy_time = g_get_monotonic_time();
+	}
+	// Check if we need to finish selector stage
+	if(event.type == JS_EVENT_BUTTON && event.number == BTN_RIGHT_Y && event.value == 1){
+		// Finish up
+		if(last_joy_time != 0){
+			save_coordinates(box_x, box_y);
+			finish_selector_stage();
+			return FALSE;
+		}
+	}
+	// Draw selector box
     draw_selector(cr, box_x, box_y); // draw selector box
 
     // Draw loaded images only if the display_image flag is true
