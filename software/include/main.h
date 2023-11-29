@@ -5,6 +5,10 @@
 #include <drawable_canvas.h>
 #include <selector.h>
 
+// Kinect support
+#include <gfreenect.h>
+#include <skeltrack.h>
+
 // Window title names
 #define TITLE_CANVAS "TagGang"
 #define TITLE_SELECTOR "Place your tag"
@@ -15,5 +19,18 @@
 
 // Shared variables
 extern GtkWidget *window;
+extern GFreenectDevice *kinect;
+extern SkeltrackSkeleton *skeleton;
+
+// types, structs, whatever
+typedef struct
+{
+  guint16 *reduced_buffer;
+  gint width;
+  gint height;
+  gint reduced_width;
+  gint reduced_height;
+} BufferInfo;
+
 
 #endif
