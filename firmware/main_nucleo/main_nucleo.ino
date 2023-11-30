@@ -84,16 +84,38 @@ int move_motors(double l, double r){
 	lSteps *= 8;
 	rSteps *= 8;
 
+  int lStepsDone = 0;
+  int rStepsDone = 0;
+  while(lStepsDone != lSteps && rStepsDone != rSteps){
+      digitalWrite(ENABLE_PIN_L, HIGH);
+      digitalWrite(ENABLE_PIN_R, HIGH);
+      if(lStepsDone < lSteps){
+        //Serial.println("Stepping L up");
+        motorL.step(8);
+        lStepsDone += 8;
+      }
+      else if(lStepsDone > lSteps){
+        //Serial.println("Stepping L down");
+        motorL.step(-8);
+        lStepsDone -= 8;
+      }
+      if(rStepsDone < rSteps){
+        motorR.step(8);
+        rStepsDone += 8;
+      }
+      else if(rStepsDone > rSteps){
+        motorR.step(-8);
+        rStepsDone -= 8;
+      }
+      //motorR.step(8);
+      digitalWrite(ENABLE_PIN_L, LOW);
+      digitalWrite(ENABLE_PIN_R, LOW);
+  }
 	// Move motors
 	// TODO: some sort of safety here to make sure neither goes negative?
 	//motorL.moveTo(lSteps); // these are absolute positions, not relative
 	//motorR.moveTo(rSteps);
-	digitalWrite(ENABLE_PIN_L, HIGH);
-	digitalWrite(ENABLE_PIN_R, HIGH);
-	motorL.step(lSteps);
-	motorR.step(rSteps);
-	digitalWrite(ENABLE_PIN_L, LOW);
-	digitalWrite(ENABLE_PIN_R, LOW);
+
 
 	lastL += dl;
 	lastR += dr;
@@ -105,12 +127,14 @@ int move_motors(double l, double r){
  * Otherwise, it will print out the command contents to the serial
  * terminal for debugging.
  */
-#define DRY_RUN 1 
+//#define DRY_RUN 1 
 int send_command(CommandType cmdType, double lz, double r){
 #if defined(DRY_RUN) && DRY_RUN
 	char buffer[10];
 	sprintf(buffer, "%d %f %f", cmdType, lz, r);
 	Serial.println(buffer);
+  Serial.println(lz, 2);
+  Serial.println(r, 2);
 	return 0;
 #else
 	switch(cmdType){
@@ -141,11 +165,11 @@ int send_command(CommandType cmdType, double lz, double r){
  */
 int exec_command(String cmd){
 	int cmdType = 0;
-	int points[2];
+	double points[2];
 	if(cmd[0] != 'G'){
 		return 1; // not supported
 	}
-	Serial.println(cmd[1] == '1');
+	//Serial.println(cmd[1] == '1');
 	switch(cmd[1]){
 		case '1':
 			if(cmd[3] == 'L'){
@@ -154,14 +178,20 @@ int exec_command(String cmd){
 				int i = 0;
 				for(int j=0; j<2; j++){
 					char point[10];
+          memset(point, 0, sizeof(point));
+          i = 0;
+          Serial.println(point);
 					while(cmd[strPos] != ' ' && cmd[strPos] != '\n'){
 						point[i] = cmd[strPos];
 						strPos++;
 						i++;
 					}
-					points[j] = atoi(point);
+          Serial.println(point);
+					points[j] = String(point).toDouble();
+          Serial.println(points[j], 1);
 					strPos += 2; //skip the space and letter if applicable
 				}
+        //Serial.println("points: %f %f", points[0], points[1]);
 				return send_command(CMD_G1LR, points[0], points[1]);
 			}
 			else if(cmd[3] == 'Z'){
