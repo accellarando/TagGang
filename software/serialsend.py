@@ -1,20 +1,20 @@
 
-# import serial
-# import time
+ import serial
+ import time
 
-# arduino = serial.Serial(port='/dev/ttyACM0', baudrate= 9600, timeout= 1)
+ arduino = serial.Serial(port='/dev/ttyACM0', baudrate= 9600, timeout= 1)
 
-# def write_read(x):
-#     arduino.write(bytes(x, 'utf-8'))
-#     time.sleep(0.05)
-#     data = arduino.readline()
-#     return data
+ def write_read(x):
+     arduino.write(bytes(x, 'utf-8'))
+     time.sleep(0.05)
+     data = arduino.readline()
+     return data
 
 
-# while True:
-#     num = input("Enter a num: ")
-#     value = write_read(num)
-#     print(value.decode().strip())
+ while True:
+     num = input("Enter a num: ")
+     value = write_read(num)
+     print(value.decode().strip())
 #!/usr/bin/python3
 # WAS move_stepper.py 
 
@@ -38,40 +38,39 @@
 
 #!/usr/bin/python3
 # Usage: ./serialMotorCMD.py numberOfSteps
-import sys
-import serial
-import time
+#import sys
+#import serial
+#import time
 
-def parse_args():
-    if len(sys.argv) < 2:
-        return -1
-    returned = send_to_arduino(sys.argv[1:])
-    print(f"returned: {returned}")
-
-def send_to_arduino(gcode_command):
-    try:
-        # Open serial connection
-        ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)  # Adjust port and baudrate as needed
-
-        # Send G-code line with a newline character
-        newCmd = (" ".join(gcode_command)+'\n').encode();
-        print(newCmd)
-        #ser.write(bytes(newCmd, 'utf-8'))
-        ser.write(newCmd)
-
-        # Wait for the Arduino to process the command (adjust as needed)
-        time.sleep(.5)
-        returned = ser.readline()
-        print(returned.decode().strip())
-        ser.close()
-        if returned == "OK\n":
-            return 0
-        else:
-            return returned.decode()
-
-        # Close the serial port
-    except Exception as e:
-        print(f"Error: {e}")
-        return e
-
-parse_args();
+#def parse_args():
+    #if len(sys.argv) < 2:
+        #return -1
+    #returned = send_to_arduino(sys.argv[1:])
+    #print(f"returned: {returned}")
+#
+#def send_to_arduino(gcode_command):
+    #try:
+        ## Open serial connection
+        #ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)  # Adjust port and baudrate as needed
+#
+        ## Send G-code line with a newline character
+        #newCmd = (" ".join(gcode_command)+'\n').encode();
+        #print(newCmd)
+        ##ser.write(bytes(newCmd, 'utf-8'))
+        #ser.write(newCmd)
+#
+        ## Wait for the Arduino to process the command (adjust as needed)
+        #time.sleep(.5)
+        #returned = ser.readline()
+        #print(returned.decode().strip())
+        #if returned == "OK\n":
+            #return 0
+        #else:
+            #return returned.decode()
+#
+        ## Close the serial port
+    #except Exception as e:
+        #print(f"Error: {e}")
+        #return e
+#
+#parse_args();
