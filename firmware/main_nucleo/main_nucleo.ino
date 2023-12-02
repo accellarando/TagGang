@@ -60,8 +60,8 @@ int pen_up(){
 }
 
 // measure what these need to be
-#define MIN_L 50
-#define MIN_R 50
+#define MIN_L 00
+#define MIN_R 00
 #define START_L 100
 #define START_R 100
 int lastL = START_L; 
@@ -244,8 +244,8 @@ void setup_motors(){
 	digitalWrite(CONTROL_PIN_L, LOW);
 	digitalWrite(CONTROL_PIN_R, LOW);
 
-	motorL.setSpeed(1000); // may need to change this param
-	motorR.setSpeed(1000); // may need to change this param
+	motorL.setSpeed(100); // may need to change this param
+	motorR.setSpeed(100); // may need to change this param
 }
 
 /**
