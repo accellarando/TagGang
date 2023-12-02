@@ -34,7 +34,7 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
 static void finish_selector_stage();
 static void save_coordinates(double x, double y);
 
-void activate_selector(  GObject* self,
+void activate_selector(  GtkApplication* self,
 		GParamSpec* pspec,
   gpointer user_data){
 	
@@ -52,7 +52,6 @@ void activate_selector(  GObject* self,
     gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
     gtk_box_pack_start(GTK_BOX(vbox), image_display_area, TRUE, TRUE, 0);
 
-	printf("Selector should be active now.\n");
     // Load and set the image
     load_and_set_image();
 
@@ -60,12 +59,15 @@ void activate_selector(  GObject* self,
     g_signal_connect(G_OBJECT(selector_area), "draw", G_CALLBACK(on_draw), NULL);
     g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press), NULL);
 
+	printf("IS_WIDGET: %d\n", GTK_IS_WIDGET(window));
     gtk_widget_set_events(window, GDK_KEY_PRESS_MASK);
     gtk_widget_show_all(window);
+	printf("Selector should be active now.\n");
 }
 
 /* Draws a selector box onto the drawing area (using Cairo API) */
 static void draw_selector(cairo_t *cr, int x, int y) {
+	printf("Drawing selector\n");
     cairo_set_source_rgba(cr, 0.0, 0.8, 0.0, 0.5); // Green 50% transparency
     cairo_rectangle(cr, x, y, GRID_SIZE, GRID_SIZE); // Create rectangle at position (x,y) w/ GRID_SIZE dimensions 
     cairo_fill(cr); // Fill rectangle with green
@@ -73,6 +75,7 @@ static void draw_selector(cairo_t *cr, int x, int y) {
 
 /* Draws the loaded image onto the drawing area (using Cairo API) */
 static void draw_images(cairo_t *cr) {
+	printf("Drawing images\n");
     if (image_pixbuf != NULL) {
         gdk_cairo_set_source_pixbuf(cr, image_pixbuf, image_x, image_y);
         cairo_paint(cr);
@@ -81,6 +84,7 @@ static void draw_images(cairo_t *cr) {
 
 /* Moves the selector box in intervals within window boundaries */
 static void move_box(double dx, double dy) {
+	printf("moving box\n");
     // Update box coordinates
     box_x += dx * GRID_SIZE;
     box_y += dy * GRID_SIZE;
@@ -113,6 +117,7 @@ static void move_box(double dx, double dy) {
 /* Callback function for the "draw" signal */
 static gdouble last_joy_time = 0;
 static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
+	printf("Start on_draw\n");
 	if(last_joy_time == 0 || (g_get_monotonic_time() - last_joy_time) > 1000000/JOY_SPEED){
 		move_box(joy_x*SNAP_INTERVAL, joy_y*SNAP_INTERVAL);
 		last_joy_time = g_get_monotonic_time();
@@ -134,6 +139,7 @@ static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
         draw_images(cr);
     }
 
+	printf("End on_draw\n");
     return FALSE; // Indicate draw operation is complete
 }
 

@@ -13,7 +13,7 @@
 #define WINDOW_WIDTH 800 // Increased window width to accommodate the image display area
 #define WINDOW_HEIGHT 500
 
-void activate_selector(GObject* self,
+void activate_selector(GtkApplication* self,
 		GParamSpec* pspec,
   gpointer user_data);
 

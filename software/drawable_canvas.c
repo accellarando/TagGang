@@ -58,6 +58,9 @@ static gboolean configure_event_cb (GtkWidget         *widget,
 	return TRUE;
 }
 
+static gboolean draw_cb (GtkWidget *widget,
+		cairo_t   *cr,
+		gpointer   data);
 static void advance_stage(){
 
 	cairo_surface_write_to_png(surface, "drawing.png");
@@ -77,6 +80,10 @@ static void advance_stage(){
 		drawing_area = NULL;
 	}
 
+	g_signal_handlers_disconnect_by_func(window, G_CALLBACK(draw_cb), NULL);
+
+	if(joints_list != NULL)
+		skeltrack_joint_list_free(joints_list); //this segfaults sometimes???? idk.
 
 	// Change window title to next stage.
 	// This also triggers the signal router for you.
@@ -101,7 +108,7 @@ static gboolean draw_cb (GtkWidget *widget,
 		cairo_t   *cr,
 		gpointer   data)
 {
-	if(surface == NULL || drawing_area == NULL)
+	if(surface == NULL || drawing_area == NULL || cr == NULL)
 		return;
 	cairo_set_source_surface (cr, surface, 0, 0);
 	cairo_paint (cr);
@@ -127,7 +134,9 @@ static gboolean draw_cb (GtkWidget *widget,
 			gtk_widget_queue_draw (widget);
 		}
 		if(event.number == BTN_RIGHT_Y){
+			printf("Advancing stage\n");
 			advance_stage();
+			return TRUE;
 		}
 	}
 	btn_available = 0;

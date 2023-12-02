@@ -192,8 +192,9 @@ static void on_depth_frame (GFreenectDevice *dev, gpointer data){
 	// draw relevant joints and process them. this sends a new
 	// draw signal hopefully
 	if(drawing_area != NULL){
-		if(GTK_IS_WIDGET(drawing_area))
+		if(GTK_IS_WIDGET(drawing_area)){
 			gtk_widget_queue_draw(drawing_area);
+		}
 	}
 }
 
@@ -330,6 +331,7 @@ int main (int    argc,
 	g_signal_connect (app, "activate", G_CALLBACK (activate), window);
 
 	status = g_application_run (G_APPLICATION (app), argc, argv);
+	gtk_main();
 
 	g_object_unref (app);
 	close(joystick_fd);
