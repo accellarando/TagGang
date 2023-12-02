@@ -1,3 +1,5 @@
+#include <Stepper.h>
+
 /*
  * Arduino code for TagGang vertical pen plotter.
  *
@@ -19,8 +21,6 @@
  * References some source code from https://github.com/euphy/polargraph_server_a1/.
  */
 #include <Arduino.h>
-#include <AccelStepper.h>
-#include <MultiStepper.h>
 #include <Servo.h>
 
 #include "pins.h"
@@ -36,8 +36,8 @@ typedef enum{
 
 Servo penServo;
 
-AccelStepper motorL(AccelStepper::FULL4WIRE, PIN_L_STEP, PIN_L_DIR);
-AccelStepper motorR(AccelStepper::FULL4WIRE, PIN_L_STEP, PIN_R_STEP); 
+Stepper motorL(200, DIR_PIN_L, STEP_PIN_L);
+Stepper motorR(200, DIR_PIN_R, STEP_PIN_R);
 
 /**
  * Directions or angles may be wrong in either of these functions.
@@ -59,18 +59,67 @@ int pen_up(){
 	penServo.detach();
 }
 
-#define GEAR_RADIUS 8.0 //mm
-#define DEGREES_PER_STEP 1.8
-#define MM_PER_STEP ((PI * GEAR_RADIUS * DEGREES_PER_STEP) / 180.0)
+// measure what these need to be
+#define MIN_L 00
+#define MIN_R 00
+#define START_L 100
+#define START_R 100
+int lastL = START_L; 
+int lastR = START_R;
+// Move to absolute position
 int move_motors(double l, double r){
-	// Convert l and r to motor steps
-	int lSteps = l / MM_PER_STEP;
-	int rSteps = r / MM_PER_STEP;
+	if(l<MIN_L)
+		return -1;
+	if(r<MIN_R)
+		return -2;
 
+	int dl = l - lastL;
+	int dr = r - lastR;
+
+	// Convert l and r to motor steps
+	int lSteps = dl / MM_PER_STEP;
+	int rSteps = dr / MM_PER_STEP;
+
+	// Each motor step needs 8 clock signals
+	lSteps *= 8;
+	rSteps *= 8;
+
+  int lStepsDone = 0;
+  int rStepsDone = 0;
+  while(lStepsDone != lSteps && rStepsDone != rSteps){
+      digitalWrite(ENABLE_PIN_L, HIGH);
+      digitalWrite(ENABLE_PIN_R, HIGH);
+      if(lStepsDone < lSteps){
+        //Serial.println("Stepping L up");
+        motorL.step(8);
+        lStepsDone += 8;
+      }
+      else if(lStepsDone > lSteps){
+        //Serial.println("Stepping L down");
+        motorL.step(-8);
+        lStepsDone -= 8;
+      }
+      if(rStepsDone < rSteps){
+        motorR.step(8);
+        rStepsDone += 8;
+      }
+      else if(rStepsDone > rSteps){
+        motorR.step(-8);
+        rStepsDone -= 8;
+      }
+      //motorR.step(8);
+      digitalWrite(ENABLE_PIN_L, LOW);
+      digitalWrite(ENABLE_PIN_R, LOW);
+  }
 	// Move motors
 	// TODO: some sort of safety here to make sure neither goes negative?
-	motorL.moveTo(lSteps); // these are absolute positions, not relative
-	motorR.moveTo(rSteps);
+	//motorL.moveTo(lSteps); // these are absolute positions, not relative
+	//motorR.moveTo(rSteps);
+
+
+	lastL += dl;
+	lastR += dr;
+	return 0;
 }
 
 /**
@@ -78,12 +127,14 @@ int move_motors(double l, double r){
  * Otherwise, it will print out the command contents to the serial
  * terminal for debugging.
  */
-#define DRY_RUN 1 
+//#define DRY_RUN 1 
 int send_command(CommandType cmdType, double lz, double r){
 #if defined(DRY_RUN) && DRY_RUN
 	char buffer[10];
 	sprintf(buffer, "%d %f %f", cmdType, lz, r);
 	Serial.println(buffer);
+  Serial.println(lz, 2);
+  Serial.println(r, 2);
 	return 0;
 #else
 	switch(cmdType){
@@ -98,6 +149,7 @@ int send_command(CommandType cmdType, double lz, double r){
 				return pen_up();
 			}
 			break;
+		//TODO: implement G28 (homing function)
 		default:
 			return 5;
 	}
@@ -113,11 +165,11 @@ int send_command(CommandType cmdType, double lz, double r){
  */
 int exec_command(String cmd){
 	int cmdType = 0;
-	int points[2];
+	double points[2];
 	if(cmd[0] != 'G'){
 		return 1; // not supported
 	}
-	Serial.println(cmd[1] == '1');
+	//Serial.println(cmd[1] == '1');
 	switch(cmd[1]){
 		case '1':
 			if(cmd[3] == 'L'){
@@ -126,14 +178,20 @@ int exec_command(String cmd){
 				int i = 0;
 				for(int j=0; j<2; j++){
 					char point[10];
+          memset(point, 0, sizeof(point));
+          i = 0;
+          Serial.println(point);
 					while(cmd[strPos] != ' ' && cmd[strPos] != '\n'){
 						point[i] = cmd[strPos];
 						strPos++;
 						i++;
 					}
-					points[j] = atoi(point);
+          Serial.println(point);
+					points[j] = String(point).toDouble();
+          Serial.println(points[j], 1);
 					strPos += 2; //skip the space and letter if applicable
 				}
+        //Serial.println("points: %f %f", points[0], points[1]);
 				return send_command(CMD_G1LR, points[0], points[1]);
 			}
 			else if(cmd[3] == 'Z'){
@@ -163,23 +221,31 @@ int exec_command(String cmd){
 }
 
 void setup_motors(){
-	// sexy sexy pin configuration
-	pinMode(PIN_L_NFAULT, INPUT);
-	pinMode(PIN_L_STEP, OUTPUT);
-	pinMode(PIN_L_DIR, OUTPUT);
-	pinMode(PIN_L_NENBL, OUTPUT);
-	pinMode(PIN_L_NHOME, INPUT);
-
-	pinMode(PIN_R_NFAULT, INPUT);
-	pinMode(PIN_R_STEP, OUTPUT);
-	pinMode(PIN_R_DIR, OUTPUT);
-	pinMode(PIN_R_NENBL, OUTPUT);
-	pinMode(PIN_R_NHOME, INPUT);
+	pinMode(DIR_PIN_L, OUTPUT);
+	pinMode(DIR_PIN_R, OUTPUT);
+	pinMode(STEP_PIN_L, OUTPUT);
+	pinMode(STEP_PIN_R, OUTPUT);
+	pinMode(ENABLE_PIN_L, OUTPUT);
+	pinMode(ENABLE_PIN_R, OUTPUT);
+	pinMode(CONTROL_PIN_L, OUTPUT);
+	pinMode(CONTROL_PIN_R, OUTPUT);
+	pinMode(RESET_PIN_L, OUTPUT);
+	pinMode(RESET_PIN_R, OUTPUT);
 
 	// Initialize stepper motors
-	digitalWrite(PIN_L_NENBL, LOW);
-	digitalWrite(PIN_R_NENBL, LOW);
+	analogWrite(VREFA_PIN_L, 50);
+	analogWrite(VREFB_PIN_L, 50);
+	analogWrite(VREFA_PIN_R, 50);
+	analogWrite(VREFB_PIN_R, 50);
 
+	digitalWrite(RESET_PIN_L, HIGH);
+	digitalWrite(RESET_PIN_R, HIGH);
+
+	digitalWrite(CONTROL_PIN_L, LOW);
+	digitalWrite(CONTROL_PIN_R, LOW);
+
+	motorL.setSpeed(100); // may need to change this param
+	motorR.setSpeed(100); // may need to change this param
 }
 
 /**
@@ -200,6 +266,9 @@ void loop(){
 	String cmd = Serial.readStringUntil('\n'); // quirk: the string has to have a space before \n for some reason?
 	Serial.println(cmd); // for debug
 	int err = exec_command(cmd);
+  //int err = 0;
+  //move_motors(50+i++, 50+i++);
+  //delay(5000);
 	if(!err){
 		Serial.println("OK");
 	}
@@ -208,22 +277,4 @@ void loop(){
 		sprintf(response, "E%03d", err);
 		Serial.println(response);
 	}
-  /*
-  move_motors(20.0+i, 20.0+i);
-  motorL.run();
-  motorR.run();
-	while(motorL.distanceToGo() != 0 || motorR.distanceToGo() != 0){
-		motorL.run();
-		motorR.run();
-	}
- */
- for(int x=0; x<800; x++){
-    digitalWrite(PIN_L_STEP, HIGH);
-    digitalWrite(PIN_R_STEP, HIGH);
-    delayMicroseconds(700);
-    digitalWrite(PIN_L_STEP, LOW);
-    digitalWrite(PIN_R_STEP, LOW);
-    delayMicroseconds(700);
- 
- }
 }
