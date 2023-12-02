@@ -68,7 +68,7 @@ void send_command(int serial_fd, const char *command) {
     printf("%s", buffer);
 }
 
-int parse_gcode() {
+int main() {
     // Open the serial port
     int serial_fd = open_serial_port();
 
