@@ -6,8 +6,9 @@ void setup(){
 
 void loop(){
   if (Serial.available()) {
-    Serial.print("Received");
-    String cmd = Serial.readStringUntil(' ');
+    //Serial.print("Received");
+    String cmd = Serial.readString();
     Serial.print(cmd);
+    //Serial.print(cmd+1);
   }
 }
