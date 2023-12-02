@@ -38,28 +38,27 @@
 
 #!/usr/bin/python3
 # Usage: ./serialMotorCMD.py numberOfSteps
-import subprocess
-import serial # PySerial library to open a serial connection
 import sys
+import serial
 import time
 
 def parse_args():
     if len(sys.argv) < 2:
         return -1
-    send_to_arduino(sys.argv[1])
+    send_to_arduino(sys.argv[2:])
 
-# Function: send step value from Python to Arduino via serial communication
-def send_to_arduino(steps):
-     # Open and configure serial connection (change as needed) using the PySerial library
-     ser = serial.Serial(port = '/dev/ttyACM0', baudrate = 115200, timeout = 1) # Linux port
+def send_to_arduino(gcode_command):
+    try:
+        # Open serial connection
+        ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)  # Adjust port and baudrate as needed
 
-     # Convert the steps value to a byte string and send it to the Arduino, with a \n char
-     # e.g., -1 -> b'-1'
-     data = (str(steps)+'\n').encode()
-     retval = ser.write(data)
+        # Send G-code line with a newline character
+        ser.write(f"{gcode_command}\n".encode())
 
-     # Close the serial port
-     ser.close()
+        # Wait for the Arduino to process the command (adjust as needed)
+        time.sleep(0.1)
 
-# Call the parse_args() function to start the program.
-parse_args();
+        # Close the serial port
+        ser.close()
+    except Exception as e:
+        print(f"Error: {e}")
