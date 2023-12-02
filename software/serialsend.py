@@ -58,7 +58,7 @@ def send_to_arduino(gcode_command):
         ser.write(f"{newCmd}\n\0".encode())
 
         # Wait for the Arduino to process the command (adjust as needed)
-        time.sleep(1)
+        time.sleep(.5)
         returned = ser.readline()
         print(returned.decode())
         if returned == "OK\n":
@@ -70,5 +70,6 @@ def send_to_arduino(gcode_command):
         ser.close()
     except Exception as e:
         print(f"Error: {e}")
+        return e
 
 parse_args();
