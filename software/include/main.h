@@ -20,7 +20,7 @@
 #define THRESHOLD_BEGIN 500
 #define THRESHOLD_END 1500 
 
-#define JOY_POLL_PERIOD 50 // ms to poll joystick for data
+#define JOY_POLL_PERIOD 100 // ms to poll joystick for data
 
 // Shared variables
 extern GtkWidget *window;

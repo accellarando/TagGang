@@ -16,7 +16,7 @@
 #include <selector.h>
 #include <stdio.h>
 
-//static GtkWidget *drawing_area;
+static GtkWidget *selector_area;
 static GtkWidget *image_display_area; // GtkImage widget for displaying the loaded image
 static GtkWidget *vbox;
 static double box_x = 0;
@@ -37,27 +37,27 @@ static void save_coordinates(double x, double y);
 void activate_selector(  GObject* self,
 		GParamSpec* pspec,
   gpointer user_data){
-	// printf("Selector should be active now.\n");
 	
     // Create a vertical box to hold the drawing area and image display area
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
     // Create drawing area
-    drawing_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(drawing_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
-    gtk_box_pack_start(GTK_BOX(vbox), drawing_area, TRUE, TRUE, 0);
+    selector_area = gtk_drawing_area_new();
+    gtk_widget_set_size_request(selector_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+    gtk_box_pack_start(GTK_BOX(vbox), selector_area, TRUE, TRUE, 0);
 
     // Create image display area
     image_display_area = gtk_image_new();
     gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
     gtk_box_pack_start(GTK_BOX(vbox), image_display_area, TRUE, TRUE, 0);
 
+	printf("Selector should be active now.\n");
     // Load and set the image
     load_and_set_image();
 
     // Connect signals to callback functions
-    g_signal_connect(G_OBJECT(drawing_area), "draw", G_CALLBACK(on_draw), NULL);
+    g_signal_connect(G_OBJECT(selector_area), "draw", G_CALLBACK(on_draw), NULL);
     g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press), NULL);
 
     gtk_widget_set_events(window, GDK_KEY_PRESS_MASK);
@@ -102,7 +102,7 @@ static void move_box(double dx, double dy) {
     if (box_y + GRID_SIZE > WINDOW_HEIGHT)
         box_y = WINDOW_HEIGHT - GRID_SIZE;
 
-    gtk_widget_queue_draw(drawing_area); // Redraw the drawing area
+    gtk_widget_queue_draw(selector_area); // Redraw the drawing area
 
     // Update the image display area with the loaded image
     /* if (image_pixbuf != NULL) { */
@@ -158,7 +158,7 @@ static void save_coordinates(double x, double y) {
 static void finish_selector_stage() {
 	// Clean up widgets
 	gtk_widget_destroy(vbox);
-	gtk_widget_destroy(drawing_area);
+	gtk_widget_destroy(selector_area);
 	gtk_widget_destroy(image_display_area);
 
 	// Disconnect signal handler for keypress
@@ -198,7 +198,7 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
 
             display_image = !display_image;  // Toggle the display_image flag
 
-            gtk_widget_queue_draw(drawing_area);
+            gtk_widget_queue_draw(selector_area);
             break;
         default:
             break;
@@ -217,15 +217,14 @@ static void load_and_set_image() {
         }
         GError *error = NULL;
         image_pixbuf = gdk_pixbuf_new_from_file(image_file_path, &error);
-		preview_pixbuf = gdk_pixbuf_new_from_file(image_file_path, &error); 
-
+		//preview_pixbuf = gdk_pixbuf_new_from_file(image_file_path, &error); 
         if (error != NULL) {
             g_printerr("Error loading %s: %s\n", image_file_path, error->message);
             g_error_free(error);
         }
 
         // Set the image in the image_display_area
-        gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), preview_pixbuf);
+        //gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), preview_pixbuf);
 
 		// Set shrunken image in the image_pixbuf buffer
 		gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), image_pixbuf);

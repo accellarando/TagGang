@@ -22,7 +22,7 @@ GtkWidget *window;
 // these are declared in the header file as extern but idk if we actually want to share them?
 GFreenectDevice *kinect = NULL; 
 SkeltrackSkeleton *skeleton = NULL;
-gfloat smoothing_factor = 0.5;
+gfloat smoothing_factor = 0.0;
 
 void scale_point_cloud(GtkApplication *app,
 		gpointer data){
@@ -192,7 +192,8 @@ static void on_depth_frame (GFreenectDevice *dev, gpointer data){
 	// draw relevant joints and process them. this sends a new
 	// draw signal hopefully
 	if(drawing_area != NULL){
-		gtk_widget_queue_draw_area(drawing_area, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+		if(GTK_IS_WIDGET(drawing_area))
+			gtk_widget_queue_draw(drawing_area);
 	}
 }
 
@@ -232,12 +233,14 @@ static void on_new_kinect(GObject *obj,
 
 	//gfreenect_device_set_tilt_angle(kinect, 0, NULL, NULL, NULL);
 	gfreenect_device_start_depth_stream(kinect, 
-			GFREENECT_DEPTH_FORMAT_MM, 
+			GFREENECT_DEPTH_FORMAT_REGISTERED, 
 			NULL);
+	/*
 	gfreenect_device_start_video_stream(kinect, 
 			GFREENECT_RESOLUTION_MEDIUM,
 			GFREENECT_VIDEO_FORMAT_RGB,
 			NULL);
+	*/
 }
 
 /**

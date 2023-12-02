@@ -65,11 +65,17 @@ static void advance_stage(){
 	clear_surface();
 
 	// Prepare for moving to next stage
-	if (surface)
+	if (surface){
 		cairo_surface_destroy (surface);
+		surface = NULL;
+	}
 	/* gtk_widget_destroy(widget); */
-	gtk_widget_destroy(frame);
-	gtk_widget_destroy(drawing_area);
+	if(frame)
+		gtk_widget_destroy(frame);
+	if(drawing_area){
+		gtk_widget_destroy(drawing_area);
+		drawing_area = NULL;
+	}
 
 
 	// Change window title to next stage.
@@ -86,10 +92,17 @@ int last_hand_x = -1;
 int last_hand_y = -1;
 int time_last_updated = 0;
 int max_pix_per_sec = 75;
+#define NUM_SAMPLES 8
+int x_samples[NUM_SAMPLES];
+int y_samples[NUM_SAMPLES];
+int sample_i = 0;
+int sample_ready = 0;
 static gboolean draw_cb (GtkWidget *widget,
 		cairo_t   *cr,
 		gpointer   data)
 {
+	if(surface == NULL || drawing_area == NULL)
+		return;
 	cairo_set_source_surface (cr, surface, 0, 0);
 	cairo_paint (cr);
 
@@ -126,6 +139,7 @@ static gboolean draw_cb (GtkWidget *widget,
 			// Do some noise filtering first:
 			int now_x = WINDOW_WIDTH - right_hand->screen_x;
 			int now_y = right_hand->screen_y;
+			/* THRESHOLD STRATEGY
 			int dx = last_hand_x == -1 ? 0 : now_x - last_hand_x;
 			int dy = last_hand_y == -1 ? 0 : now_y - last_hand_y;
 			int dt = time(NULL) - time_last_updated;
@@ -138,20 +152,45 @@ static gboolean draw_cb (GtkWidget *widget,
 				//ignore this point
 				return;
 			}
+			*/
+			/* AVERAGE STRATEGY */
+			x_samples[sample_i] = now_x;
+			y_samples[sample_i++] = now_y;
+			int avg_x = 0;
+			int avg_y = 0;
+			if(sample_i >= NUM_SAMPLES){
+				for(int i=0; i<sample_i; i++){
+					avg_x += x_samples[i];
+					avg_y += y_samples[i];
+				}
+				avg_x /= NUM_SAMPLES;
+				avg_y /= NUM_SAMPLES;
+				sample_i = 0;
+				sample_ready = 1;
+			}
 
+
+			/*
 			last_hand_x = now_x;
 			last_hand_y = now_y;
 			time_last_updated = time(NULL);
+			*/
 
 			cairo_set_source_rgb(cr, 1, 0, 0);
-			cairo_arc(cr, now_x, now_y, 10, 0, 2 * G_PI);
+			cairo_arc(cr, last_hand_x, last_hand_y, 10, 0, 2 * G_PI);
 			cairo_fill(cr);
 
-			if(pen_down){
-				draw_brush(widget, now_x, now_y);
+			if(sample_ready){
+				if(pen_down){
+					draw_brush(widget, avg_x, avg_y);
+				}
+				last_hand_x = avg_x;
+				last_hand_y = avg_y;
+				sample_ready = 0;
 			}
 		}
-		//skeltrack_joint_list_free(joints_list); //this segfaults sometimes???? idk.
+		//if(joints_list != NULL)
+			//skeltrack_joint_list_free(joints_list); //this segfaults sometimes???? idk.
 	}
 	return FALSE;
 }
