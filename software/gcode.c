@@ -110,8 +110,8 @@ void activate_gcoder(GObject* self,
 
 	// todo: put a loading bar here that lets you keep track of progress. For now, just put some placeholder text.
 	label = gtk_label_new("Generating gcode!");
-    gtk_container_add(GTK_CONTAINER(window), label);
-    gtk_widget_show_all(window);
+    gtk_container_add(GTK_CONTAINER(frame), label);
+    //gtk_widget_show_all(window);
 
 	scale_paths(points_list, 10, 10);
 

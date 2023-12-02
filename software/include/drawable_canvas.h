@@ -19,4 +19,5 @@ extern GList* points_list;
 extern SkeltrackJointList joints_list;
 
 extern GtkWidget* drawing_area;
+extern GtkWidget* frame;
 #endif

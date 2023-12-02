@@ -16,7 +16,7 @@
 #include <selector.h>
 #include <stdio.h>
 
-static GtkWidget *selector_area;
+GtkWidget *selector_area;
 static GtkWidget *image_display_area; // GtkImage widget for displaying the loaded image
 static GtkWidget *vbox;
 static double box_x = 0;
@@ -34,13 +34,20 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
 static void finish_selector_stage();
 static void save_coordinates(double x, double y);
 
+static void destroy_widget(GtkWidget* widget, gpointer data){
+	gtk_widget_destroy(widget);
+}
+
 void activate_selector(  GtkApplication* self,
 		GParamSpec* pspec,
   gpointer user_data){
-	
+
+	// make sure window is empty
+	//gtk_container_foreach(GTK_CONTAINER(window), destroy_widget, NULL);
+
     // Create a vertical box to hold the drawing area and image display area
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_container_add(GTK_CONTAINER(window), vbox);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
 
     // Create drawing area
     selector_area = gtk_drawing_area_new();
@@ -59,7 +66,6 @@ void activate_selector(  GtkApplication* self,
     g_signal_connect(G_OBJECT(selector_area), "draw", G_CALLBACK(on_draw), NULL);
     g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press), NULL);
 
-	printf("IS_WIDGET: %d\n", GTK_IS_WIDGET(window));
     gtk_widget_set_events(window, GDK_KEY_PRESS_MASK);
     gtk_widget_show_all(window);
 	printf("Selector should be active now.\n");
@@ -118,7 +124,8 @@ static void move_box(double dx, double dy) {
 static gdouble last_joy_time = 0;
 static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
 	printf("Start on_draw\n");
-	if(last_joy_time == 0 || (g_get_monotonic_time() - last_joy_time) > 1000000/JOY_SPEED){
+	if(last_joy_time == 0 || (unsigned int)(g_get_monotonic_time() - last_joy_time) > 1000000/JOY_SPEED){
+		printf("joy x, y: %d %d\n", joy_x, joy_y);
 		move_box(joy_x*SNAP_INTERVAL, joy_y*SNAP_INTERVAL);
 		last_joy_time = g_get_monotonic_time();
 	}
@@ -163,9 +170,12 @@ static void save_coordinates(double x, double y) {
 
 static void finish_selector_stage() {
 	// Clean up widgets
-	gtk_widget_destroy(vbox);
-	gtk_widget_destroy(selector_area);
+	/*
+	*/
 	gtk_widget_destroy(image_display_area);
+	gtk_widget_destroy(selector_area);
+	//gtk_widget_destroy(vbox);
+	selector_area = NULL;
 
 	// Disconnect signal handler for keypress
 	g_signal_handlers_disconnect_by_func(window, G_CALLBACK(on_key_press), NULL);

@@ -29,10 +29,6 @@ void scale_point_cloud(GtkApplication *app,
 	GList* paths = (GList*) data;
 }
 
-void activate_plotter(GtkApplication *app, void* hi, gpointer data){
-}
-
-
 /**
  * This function routes Title Change signals to the appropriate
  * function, based on the current state of the program.
@@ -274,7 +270,7 @@ volatile struct js_event event;
 gboolean check_for_js_events(gpointer data){
 	int joystick_fd = *((int*)data);
 	if(read_event(joystick_fd, &event) == 0){
-		//g_print("Joystick event! type: %d, number: %d, value: %d\n", event.type, event.number, event.value);
+		g_print("Joystick event! type: %d, number: %d, value: %d\n", event.type, event.number, event.value);
 		if(event.type == JS_EVENT_BUTTON){
 			btn_available = 1;
 		}
@@ -303,8 +299,13 @@ gboolean check_for_js_events(gpointer data){
 					joy_y = 0;
 				}
 			}
+
+		}
+		if(selector_area != NULL){
+			gtk_widget_queue_draw(selector_area);
 		}
 	}
+
 	return G_SOURCE_CONTINUE;
 }
 

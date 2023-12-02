@@ -43,6 +43,7 @@ static gboolean configure_event_cb (GtkWidget         *widget,
 		GdkEventConfigure *event,
 		gpointer           data)
 {
+	printf("configure\n");
 	if (surface)
 		cairo_surface_destroy (surface);
 
@@ -56,6 +57,10 @@ static gboolean configure_event_cb (GtkWidget         *widget,
 
 	/* We've handled the configure event, no need for further processing. */
 	return TRUE;
+}
+
+static void destroy_widget(GtkWidget* widget, gpointer data){
+	gtk_widget_destroy(widget);
 }
 
 static gboolean draw_cb (GtkWidget *widget,
@@ -72,15 +77,23 @@ static void advance_stage(){
 		cairo_surface_destroy (surface);
 		surface = NULL;
 	}
-	/* gtk_widget_destroy(widget); */
-	if(frame)
+	/* This segfaults, but if you don't destroy it then the tag selector doesn't show up.
+	 * so like, what the fuck
+	if(frame){
 		gtk_widget_destroy(frame);
+		frame = NULL;
+	}
+	*/
 	if(drawing_area){
+		g_signal_handlers_disconnect_by_func(drawing_area, G_CALLBACK(draw_cb), NULL);
 		gtk_widget_destroy(drawing_area);
 		drawing_area = NULL;
 	}
 
-	g_signal_handlers_disconnect_by_func(window, G_CALLBACK(draw_cb), NULL);
+	//fuck it let's try it this way
+	//gtk_container_foreach(GTK_CONTAINER(window), destroy_widget, NULL);
+	//still nothing
+
 
 	if(joints_list != NULL)
 		skeltrack_joint_list_free(joints_list); //this segfaults sometimes???? idk.
@@ -108,8 +121,11 @@ static gboolean draw_cb (GtkWidget *widget,
 		cairo_t   *cr,
 		gpointer   data)
 {
-	if(surface == NULL || drawing_area == NULL || cr == NULL)
-		return;
+	if(surface == NULL || drawing_area == NULL || cr == NULL){
+		printf("something was null\n");
+		return FALSE;
+	}
+	printf("draw cb\n");
 	cairo_set_source_surface (cr, surface, 0, 0);
 	cairo_paint (cr);
 
@@ -134,8 +150,9 @@ static gboolean draw_cb (GtkWidget *widget,
 			gtk_widget_queue_draw (widget);
 		}
 		if(event.number == BTN_RIGHT_Y){
-			printf("Advancing stage\n");
+			btn_available = 0;
 			advance_stage();
+			printf("Advancing stage\n");
 			return TRUE;
 		}
 	}
@@ -293,6 +310,7 @@ static gboolean button_release_event_cb (GtkWidget      *widget,
 		GdkEventButton *event,
 		gpointer        data)
 {
+	printf("button release\n");
 	if (event->button == BUTTON_PEN_DOWN)
 	{
 		//printf("Button released\n");
@@ -335,6 +353,7 @@ void activate_canvas (GtkApplication *app,
 		void*		i_forgot,
 		gpointer	 user_data)
 {
+	printf("activate_canvas\n");
 	window = (GtkWidget*) user_data;
 
 	g_signal_connect (window, "destroy", G_CALLBACK (close_window), NULL);
