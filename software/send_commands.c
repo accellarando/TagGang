@@ -8,21 +8,46 @@
 #include <send_commands.h>
 #include <stdio.h>
 
+#define BUFFER_SIZE 512
+
+static int send_command(char* cmd){
+	char* python = "python serialMotorCMD.py %s";
+	char buffer[BUFFER_SIZE + strlen(python)];
+	sprintf(buffer, python, cmd);
+	int status = system(cmd);
+	return status;
+}
+
+static void parse_gcode(char* filename){
+	FILE *gcode_file = fopen("/home/ella/Documents/gtext.gcode", "r");
+	if(gcode_file == NULL){
+		printf("Error opening gcode file!\n");
+	}
+
+	char line[BUFFER_SIZE];
+	while(fgets(line, sizeof(line), gcode_file) != NULL){
+		int err = send_command(line);
+		if(err != 0)
+			printf("Error from plotter: %d\n", err);
+	}
+
+	fclose(gcode_file);
+}
+
 /**
  * Sets up the GUI for this stage, then starts the file reading/sending process.
  */
-void activate_plotter(GtkApplication *app, void* hi, gpointer data){
+void activate_plotter(GtkApplication *app, GParamSpec* pspec, gpointer data){
 	// Set up GUI with some placeholder text
 	// TODO: put a loading bar here that lets you keep track of progress. For now, just put some placeholder text.
 	GtkWidget *label = gtk_label_new("Sending over serial!");
     gtk_container_add(GTK_CONTAINER(window), label);
     gtk_widget_show_all(window);
 
-	parse_gcode();
-
+	// Read file line by line, send over serial terminal
+	parse_gcode("output.gcode");
 
 	finish_sending_stage();
-	// Read file line by line, send over serial terminal
 }
 
 
