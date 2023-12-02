@@ -34,13 +34,23 @@ static void parse_gcode(char* filename){
 	fclose(gcode_file);
 }
 
+static GtkWidget *label;
+
+static void finish_sending_stage() {
+	// Clean up widgets
+	gtk_widget_destroy(label);
+
+	// Change window title
+	gtk_window_set_title(GTK_WINDOW(window), TITLE_CANVAS);
+}
+
 /**
  * Sets up the GUI for this stage, then starts the file reading/sending process.
  */
-void activate_plotter(GtkApplication *app, GParamSpec* pspec, gpointer data){
+void activate_plotter(GObject *self, GParamSpec* pspec, gpointer data){
 	// Set up GUI with some placeholder text
 	// TODO: put a loading bar here that lets you keep track of progress. For now, just put some placeholder text.
-	GtkWidget *label = gtk_label_new("Sending over serial!");
+	label = gtk_label_new("Sending over serial!");
     gtk_container_add(GTK_CONTAINER(window), label);
     gtk_widget_show_all(window);
 
@@ -52,12 +62,3 @@ void activate_plotter(GtkApplication *app, GParamSpec* pspec, gpointer data){
 
 
 
-static void finish_sending_stage() {
-	// Clean up widgets
-	gtk_widget_destroy(drawing_area);
-	gtk_widget_destroy(image_display_area);
-	gtk_widget_destroy(vbox);
-
-	// Change window title
-	gtk_window_set_title(GTK_WINDOW(window), TITLE_CANVAS);
-}

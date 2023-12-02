@@ -45,20 +45,30 @@ import time
 def parse_args():
     if len(sys.argv) < 2:
         return -1
-    send_to_arduino(sys.argv[2:])
+    returned = send_to_arduino(sys.argv[1:])
+    print(f"returned: {returned}")
 
 def send_to_arduino(gcode_command):
     try:
         # Open serial connection
-        ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)  # Adjust port and baudrate as needed
+        ser = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=1)  # Adjust port and baudrate as needed
 
         # Send G-code line with a newline character
-        ser.write(f"{gcode_command}\n".encode())
+        newCmd = " ".join(gcode_command);
+        ser.write(f"{newCmd}\n\0".encode())
 
         # Wait for the Arduino to process the command (adjust as needed)
-        time.sleep(0.1)
+        time.sleep(1)
+        returned = ser.readline()
+        print(returned.decode())
+        if returned == "OK\n":
+            return 0
+        else:
+            return returned.decode()
 
         # Close the serial port
         ser.close()
     except Exception as e:
         print(f"Error: {e}")
+
+parse_args();
