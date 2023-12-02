@@ -18,9 +18,14 @@ void activate_plotter(GtkApplication *app, void* hi, gpointer data){
     gtk_container_add(GTK_CONTAINER(window), label);
     gtk_widget_show_all(window);
 
+	parse_gcode();
+
+
 	finish_sending_stage();
 	// Read file line by line, send over serial terminal
 }
+
+
 
 static void finish_sending_stage() {
 	// Clean up widgets
@@ -29,5 +34,5 @@ static void finish_sending_stage() {
 	gtk_widget_destroy(vbox);
 
 	// Change window title
-	gtk_window_set_title(GTK_WINDOW(window), TITLE_GCODER);
+	gtk_window_set_title(GTK_WINDOW(window), TITLE_CANVAS);
 }
