@@ -7,6 +7,7 @@ def write_read(x):
     arduino.write(bytes(x, 'utf-8'))
     time.sleep(0.05)
     data = arduino.readline()
+    print(data)
     return data
     
 while True:

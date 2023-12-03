@@ -12,7 +12,7 @@ def parse_args():
 
 def send_to_arduino(gcode_command):
 	#print("IN python: send_to_arduino");
-	ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)
+	ser = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=1)
 	gcode_command = gcode_command[0].strip("[]'")
 	data = (f"{gcode_command}\n").encode()
 	#print(data);
