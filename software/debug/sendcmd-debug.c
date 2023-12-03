@@ -17,12 +17,20 @@
 
 static int send_command(char* cmd){
 	// constructs the command to call py script
-	char* python = "python3 %s \"%s\"";
-	char buffer[BUFFER_SIZE + strlen(python)];
-	sprintf(buffer, python, PYTHON_SCRIPT_PATH, cmd);
+	char python_cmd[BUFFER_SIZE];
+	snprintf(python_cmd, sizeof(python_cmd), "python3 %s \"%s\"", PYTHON_SCRIPT_PATH, cmd);
+	 
+	if (chars_written < 0 || chars_written >= sizeof(python_cmd)) {
+		fprintf(stderr, "HELP ERROR\n");
+		exit(EXIT_FAILURE);
+	}
+	//char* python = "python3 %s \"%s\"";
+	//char buffer[BUFFER_SIZE + strlen(python)];
+	//sprintf(buffer, python, PYTHON_SCRIPT_PATH, cmd);
+	printf("COMMAND %s_\n");
+	
 	system(cmd);
-	//int status = system(cmd);
-	//return status;
+
 }
 
 static void parse_gcode(){
@@ -35,8 +43,8 @@ static void parse_gcode(){
 	char line[256];
 	while(fgets(line, sizeof(line), gcode_file) != NULL){
 		line[strcspn(line, "\n")] = '\0'; // remove newline char
-		printf("%sEND_", line);
-		//send_command(line);
+		//printf("%s_END_", line);
+		send_command(line);
 		//int err = send_command(line);
 		//if(err != 0)
 			//printf("Error from plotter: %d\n", err);
