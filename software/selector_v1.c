@@ -16,7 +16,7 @@
 #include <selector.h>
 #include <stdio.h>
 
-static GtkWidget *drawing_area;
+GtkWidget *selector_area;
 static GtkWidget *image_display_area; // GtkImage widget for displaying the loaded image
 static GtkWidget *vbox;
 static double box_x = 0;
@@ -28,24 +28,31 @@ static GdkPixbuf *image_pixbuf = NULL;
 static GdkPixbuf *preview_pixbuf = NULL;
 static gboolean display_image = FALSE;  // Flag to control image display
 
-
 static void load_and_set_image();
 static gboolean on_draw (GtkWidget *widget, cairo_t *cr, gpointer data);
 static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
+static void finish_selector_stage();
+static void save_coordinates(double x, double y);
 
-void activate_selector(  GObject* self,
+static void destroy_widget(GtkWidget* widget, gpointer data){
+	gtk_widget_destroy(widget);
+}
+
+void activate_selector(  GtkApplication* self,
 		GParamSpec* pspec,
   gpointer user_data){
-	// printf("Selector should be active now.\n");
-	
+
+	// make sure window is empty
+	//gtk_container_foreach(GTK_CONTAINER(window), destroy_widget, NULL);
+
     // Create a vertical box to hold the drawing area and image display area
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_container_add(GTK_CONTAINER(window), vbox);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
 
     // Create drawing area
-    drawing_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(drawing_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
-    gtk_box_pack_start(GTK_BOX(vbox), drawing_area, TRUE, TRUE, 0);
+    selector_area = gtk_drawing_area_new();
+    gtk_widget_set_size_request(selector_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+    gtk_box_pack_start(GTK_BOX(vbox), selector_area, TRUE, TRUE, 0);
 
     // Create image display area
     image_display_area = gtk_image_new();
@@ -56,16 +63,17 @@ void activate_selector(  GObject* self,
     load_and_set_image();
 
     // Connect signals to callback functions
-    g_signal_connect(G_OBJECT(drawing_area), "draw", G_CALLBACK(on_draw), NULL);
+    g_signal_connect(G_OBJECT(selector_area), "draw", G_CALLBACK(on_draw), NULL);
     g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press), NULL);
 
     gtk_widget_set_events(window, GDK_KEY_PRESS_MASK);
     gtk_widget_show_all(window);
-
+	printf("Selector should be active now.\n");
 }
 
 /* Draws a selector box onto the drawing area (using Cairo API) */
 static void draw_selector(cairo_t *cr, int x, int y) {
+	printf("Drawing selector\n");
     cairo_set_source_rgba(cr, 0.0, 0.8, 0.0, 0.5); // Green 50% transparency
     cairo_rectangle(cr, x, y, GRID_SIZE, GRID_SIZE); // Create rectangle at position (x,y) w/ GRID_SIZE dimensions 
     cairo_fill(cr); // Fill rectangle with green
@@ -73,6 +81,7 @@ static void draw_selector(cairo_t *cr, int x, int y) {
 
 /* Draws the loaded image onto the drawing area (using Cairo API) */
 static void draw_images(cairo_t *cr) {
+	printf("Drawing images\n");
     if (image_pixbuf != NULL) {
         gdk_cairo_set_source_pixbuf(cr, image_pixbuf, image_x, image_y);
         cairo_paint(cr);
@@ -81,6 +90,7 @@ static void draw_images(cairo_t *cr) {
 
 /* Moves the selector box in intervals within window boundaries */
 static void move_box(double dx, double dy) {
+	printf("moving box\n");
     // Update box coordinates
     box_x += dx * GRID_SIZE;
     box_y += dy * GRID_SIZE;
@@ -102,7 +112,7 @@ static void move_box(double dx, double dy) {
     if (box_y + GRID_SIZE > WINDOW_HEIGHT)
         box_y = WINDOW_HEIGHT - GRID_SIZE;
 
-    gtk_widget_queue_draw(drawing_area); // Redraw the drawing area
+    gtk_widget_queue_draw(selector_area); // Redraw the drawing area
 
     // Update the image display area with the loaded image
     /* if (image_pixbuf != NULL) { */
@@ -111,7 +121,24 @@ static void move_box(double dx, double dy) {
 }
 
 /* Callback function for the "draw" signal */
+static gdouble last_joy_time = 0;
 static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
+	printf("Start on_draw\n");
+	if(last_joy_time == 0 || (unsigned int)(g_get_monotonic_time() - last_joy_time) > 1000000/JOY_SPEED){
+		printf("joy x, y: %d %d\n", joy_x, joy_y);
+		move_box(joy_x*SNAP_INTERVAL, joy_y*SNAP_INTERVAL);
+		last_joy_time = g_get_monotonic_time();
+	}
+	// Check if we need to finish selector stage
+	if(btn_available == 1 && event.type == JS_EVENT_BUTTON && event.number == BTN_RIGHT_Y && event.value == 1){
+		// Finish up
+		if(last_joy_time != 0){
+			save_coordinates(box_x, box_y);
+			finish_selector_stage();
+			return FALSE;
+		}
+	}
+	// Draw selector box
     draw_selector(cr, box_x, box_y); // draw selector box
 
     // Draw loaded images only if the display_image flag is true
@@ -119,6 +146,7 @@ static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
         draw_images(cr);
     }
 
+	printf("End on_draw\n");
     return FALSE; // Indicate draw operation is complete
 }
 
@@ -127,19 +155,30 @@ static void send_coordinates() {
     g_print("Box Coordinates: (%.0f, %.0f)\n", box_x, box_y);
 }
 
+static GList* point_path = NULL;
 static void save_coordinates(double x, double y) {
 	g_print("Box Coordinates: (%.0f, %.0f)\n", x, y);
+
 	DoublePoint* p = malloc(sizeof(DoublePoint));
+
 	p->x = x;
 	p->y = y;
-	points_list = g_list_prepend(points_list, p);
+
+	point_path = g_list_append(point_path, p);
+	points_list = g_list_prepend(points_list, point_path);
 }
 
 static void finish_selector_stage() {
 	// Clean up widgets
-	gtk_widget_destroy(drawing_area);
+	/*
+	*/
 	gtk_widget_destroy(image_display_area);
-	gtk_widget_destroy(vbox);
+	gtk_widget_destroy(selector_area);
+	//gtk_widget_destroy(vbox);
+	selector_area = NULL;
+
+	// Disconnect signal handler for keypress
+	g_signal_handlers_disconnect_by_func(window, G_CALLBACK(on_key_press), NULL);
 
 	// Change window title
 	gtk_window_set_title(GTK_WINDOW(window), TITLE_GCODER);
@@ -163,17 +202,6 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
             break;
         case GDK_KEY_Return:
             if (display_image) {
-                // Shrink the image to the size of the selector box - not anymore, now do one-shot
-				/*
-                GdkPixbuf *shrunken_pixbuf = gdk_pixbuf_scale_simple(
-                    image_pixbuf,
-                    GRID_SIZE, GRID_SIZE,
-                    GDK_INTERP_BILINEAR
-                );
-
-                g_object_unref(image_pixbuf);
-                image_pixbuf = shrunken_pixbuf;
-				*/
 
 				// Finish up
 				save_coordinates(box_x, box_y);
@@ -186,7 +214,7 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
 
             display_image = !display_image;  // Toggle the display_image flag
 
-            gtk_widget_queue_draw(drawing_area);
+            gtk_widget_queue_draw(selector_area);
             break;
         default:
             break;
@@ -205,15 +233,14 @@ static void load_and_set_image() {
         }
         GError *error = NULL;
         image_pixbuf = gdk_pixbuf_new_from_file(image_file_path, &error);
-		preview_pixbuf = gdk_pixbuf_new_from_file(image_file_path, &error); 
-
+		//preview_pixbuf = gdk_pixbuf_new_from_file(image_file_path, &error); 
         if (error != NULL) {
             g_printerr("Error loading %s: %s\n", image_file_path, error->message);
             g_error_free(error);
         }
 
         // Set the image in the image_display_area
-        gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), preview_pixbuf);
+        //gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), preview_pixbuf);
 
 		// Set shrunken image in the image_pixbuf buffer
 		gtk_image_set_from_pixbuf(GTK_IMAGE(image_display_area), image_pixbuf);
@@ -225,48 +252,3 @@ static void load_and_set_image() {
     }
 }
 
-/*
-int main(int argc, char *argv[]) {
-    gtk_init(&argc, &argv);
-
-    if (argc != 2) {
-        g_print("Error: Please provide an image file path\n");
-        return -1;
-    }
-
-    image_file_path = argv[1];
-
-    // Create window
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "Snapping Box");
-    gtk_window_set_default_size(GTK_WINDOW(window), WINDOW_WIDTH, WINDOW_HEIGHT);
-
-    // Create a vertical box to hold the drawing area and image display area
-    GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_container_add(GTK_CONTAINER(window), vbox);
-
-    // Create drawing area
-    drawing_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(drawing_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
-    gtk_box_pack_start(GTK_BOX(vbox), drawing_area, TRUE, TRUE, 0);
-
-    // Create image display area
-    image_display_area = gtk_image_new();
-    gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
-    gtk_box_pack_start(GTK_BOX(vbox), image_display_area, TRUE, TRUE, 0);
-
-    // Load and set the image
-    load_and_set_image();
-
-    // Connect signals to callback functions
-    g_signal_connect(G_OBJECT(drawing_area), "draw", G_CALLBACK(on_draw), NULL);
-    g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press), NULL);
-
-    gtk_widget_set_events(window, GDK_KEY_PRESS_MASK);
-    gtk_widget_show_all(window);
-
-    gtk_main();
-
-    return 0;
-}
-*/

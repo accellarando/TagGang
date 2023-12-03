@@ -18,6 +18,12 @@ GtkApplication	 *app			= NULL;
 GtkWidget *frame;
 GtkWidget *drawing_area;
 
+GList* points_list = NULL;
+GList* current_path = NULL;
+static gdouble last_x = -1.0;
+static gdouble last_y = -1.0;
+static void draw_brush (GtkWidget *widget, gdouble x, gdouble y);
+
 /***
  * This function clears the drawing off of the surface.
  */
@@ -37,6 +43,7 @@ static gboolean configure_event_cb (GtkWidget         *widget,
 		GdkEventConfigure *event,
 		gpointer           data)
 {
+	printf("configure\n");
 	if (surface)
 		cairo_surface_destroy (surface);
 
@@ -52,17 +59,165 @@ static gboolean configure_event_cb (GtkWidget         *widget,
 	return TRUE;
 }
 
+static void destroy_widget(GtkWidget* widget, gpointer data){
+	gtk_widget_destroy(widget);
+}
+
+static gboolean draw_cb (GtkWidget *widget,
+		cairo_t   *cr,
+		gpointer   data);
+static void advance_stage(){
+
+	cairo_surface_write_to_png(surface, "drawing.png");
+	// Clear the screen
+	clear_surface();
+
+	// Prepare for moving to next stage
+	if (surface){
+		cairo_surface_destroy (surface);
+		surface = NULL;
+	}
+	/* This segfaults, but if you don't destroy it then the tag selector doesn't show up.
+	 * so like, what the fuck
+	if(frame){
+		gtk_widget_destroy(frame);
+		frame = NULL;
+	}
+	*/
+	if(drawing_area){
+		g_signal_handlers_disconnect_by_func(drawing_area, G_CALLBACK(draw_cb), NULL);
+		gtk_widget_destroy(drawing_area);
+		drawing_area = NULL;
+	}
+
+	//fuck it let's try it this way
+	//gtk_container_foreach(GTK_CONTAINER(window), destroy_widget, NULL);
+	//still nothing
+
+
+	if(joints_list != NULL)
+		skeltrack_joint_list_free(joints_list); //this segfaults sometimes???? idk.
+
+	// Change window title to next stage.
+	// This also triggers the signal router for you.
+	gtk_window_set_title(window, TITLE_SELECTOR);
+}
 /* Redraw the screen from the surface. Note that the ::draw
  * signal receives a ready-to-be-used cairo_t that is already
  * clipped to only draw the exposed areas of the widget
  */
+SkeltrackJointList joints_list;
+volatile int pen_down = 0;
+int last_hand_x = -1;
+int last_hand_y = -1;
+int time_last_updated = 0;
+int max_pix_per_sec = 75;
+#define NUM_SAMPLES 8
+int x_samples[NUM_SAMPLES];
+int y_samples[NUM_SAMPLES];
+int sample_i = 0;
+int sample_ready = 0;
 static gboolean draw_cb (GtkWidget *widget,
 		cairo_t   *cr,
 		gpointer   data)
 {
+	if(surface == NULL || drawing_area == NULL || cr == NULL){
+		printf("something was null\n");
+		return FALSE;
+	}
+	printf("draw cb\n");
 	cairo_set_source_surface (cr, surface, 0, 0);
 	cairo_paint (cr);
 
+	GAsyncResult *res = NULL;
+	GError *error = NULL;
+
+	// Process if pen is up or down
+	if(btn_available){
+		if(event.number == BTN_RIGHT_A){
+			pen_down = event.value;
+			// button up: finish path
+			if(!event.value){
+				points_list = g_list_append(points_list, current_path);
+				current_path = NULL;
+				last_x = -1.0;
+				last_y = -1.0;
+			}
+		}
+		if(event.number == BTN_RIGHT_B){
+			// b: clear surface
+			clear_surface ();
+			gtk_widget_queue_draw (widget);
+		}
+		if(event.number == BTN_RIGHT_Y){
+			btn_available = 0;
+			advance_stage();
+			printf("Advancing stage\n");
+			return TRUE;
+		}
+	}
+	btn_available = 0;
+
+	if(error == NULL && joints_list != NULL){
+		SkeltrackJoint *right_hand = skeltrack_joint_list_get_joint(joints_list, SKELTRACK_JOINT_ID_RIGHT_HAND);
+		if(right_hand != NULL){
+			// Paint right hand on canvas as a circle
+			// Do some noise filtering first:
+			int now_x = WINDOW_WIDTH - right_hand->screen_x;
+			int now_y = right_hand->screen_y;
+			/* THRESHOLD STRATEGY
+			int dx = last_hand_x == -1 ? 0 : now_x - last_hand_x;
+			int dy = last_hand_y == -1 ? 0 : now_y - last_hand_y;
+			int dt = time(NULL) - time_last_updated;
+			if(time_last_updated == 0)
+				dt = 1;
+			int dxdt = dt == 0 ? dx : dx/dt;
+			int dydt = dt == 0 ? dy : dy/dt;
+			//g_print("dxdt: %d, dydt: %d\n", dxdt, dydt);
+			if(abs(dxdt) > max_pix_per_sec || abs(dydt) > max_pix_per_sec){
+				//ignore this point
+				return;
+			}
+			*/
+			/* AVERAGE STRATEGY */
+			x_samples[sample_i] = now_x;
+			y_samples[sample_i++] = now_y;
+			int avg_x = 0;
+			int avg_y = 0;
+			if(sample_i >= NUM_SAMPLES){
+				for(int i=0; i<sample_i; i++){
+					avg_x += x_samples[i];
+					avg_y += y_samples[i];
+				}
+				avg_x /= NUM_SAMPLES;
+				avg_y /= NUM_SAMPLES;
+				sample_i = 0;
+				sample_ready = 1;
+			}
+
+
+			/*
+			last_hand_x = now_x;
+			last_hand_y = now_y;
+			time_last_updated = time(NULL);
+			*/
+
+			cairo_set_source_rgb(cr, 1, 0, 0);
+			cairo_arc(cr, last_hand_x, last_hand_y, 10, 0, 2 * G_PI);
+			cairo_fill(cr);
+
+			if(sample_ready){
+				if(pen_down){
+					draw_brush(widget, avg_x, avg_y);
+				}
+				last_hand_x = avg_x;
+				last_hand_y = avg_y;
+				sample_ready = 0;
+			}
+		}
+		//if(joints_list != NULL)
+			//skeltrack_joint_list_free(joints_list); //this segfaults sometimes???? idk.
+	}
 	return FALSE;
 }
 
@@ -72,10 +227,6 @@ static gboolean draw_cb (GtkWidget *widget,
  * { { {0,0}, {0,1}, ...},
  *	 { {5, 6}, {7,8} ...}}
  */
-GList* points_list = NULL;
-GList* current_path = NULL;
-static gdouble last_x = -1.0;
-static gdouble last_y = -1.0;
 /* Draw a rectangle on the surface at the given position */
 static void draw_brush (GtkWidget *widget,
 		gdouble    x,
@@ -133,6 +284,7 @@ static gboolean button_press_event_cb (GtkWidget      *widget,
 	if (surface == NULL)
 		return FALSE;
 
+	g_print("Button pressed: %d\n", event->button);
 	if (event->button == BUTTON_PEN_DOWN)
 	{
 		draw_brush (widget, event->x, event->y);
@@ -144,22 +296,7 @@ static gboolean button_press_event_cb (GtkWidget      *widget,
 	}
 	else if(event->button == BUTTON_SAVE){
 		// Save the current drawing to a file
-		cairo_surface_write_to_png(surface, "drawing.png");
-		// Clear the screen
-		clear_surface();
-		gtk_widget_queue_draw (widget);
-
-		// Prepare for moving to next stage
-		if (surface)
-			cairo_surface_destroy (surface);
-		/* gtk_widget_destroy(widget); */
-		gtk_widget_destroy(frame);
-		gtk_widget_destroy(drawing_area);
-
-		
-		// Change window title to next stage.
-		// This also triggers the signal router for you.
-		gtk_window_set_title(window, TITLE_SELECTOR);
+		advance_stage();
 	}
 
 	/* We've handled the event, stop processing */
@@ -173,6 +310,7 @@ static gboolean button_release_event_cb (GtkWidget      *widget,
 		GdkEventButton *event,
 		gpointer        data)
 {
+	printf("button release\n");
 	if (event->button == BUTTON_PEN_DOWN)
 	{
 		//printf("Button released\n");
@@ -215,6 +353,7 @@ void activate_canvas (GtkApplication *app,
 		void*		i_forgot,
 		gpointer	 user_data)
 {
+	printf("activate_canvas\n");
 	window = (GtkWidget*) user_data;
 
 	g_signal_connect (window, "destroy", G_CALLBACK (close_window), NULL);
