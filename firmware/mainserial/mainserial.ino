@@ -6,10 +6,10 @@ void setup(){
 
 void loop(){
   if (Serial.available()) {
-    //Serial.print("Received");
-    String cmd = Serial.readStringUntil('\n');
+    Serial.print("Received");
+    //String cmd = Serial.readStringUntil('\n');
     //int cmd = Serial.readString().toInt();
-    Serial.print(cmd);
+    //Serial.print(cmd);
     //Serial.print(cmd+1);
   }
 }

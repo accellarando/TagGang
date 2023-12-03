@@ -259,13 +259,13 @@ void setup(){
 	//setup_motors();
 
 	//Serial.println("OK");
- i = 0;
+ //i = 0;
 }
 
 void loop(){
   if (Serial.available()){
     String cmd = Serial.readStringUntil('\n'); // quirk: the string has to have a space before \n for some reason?
-    Serial.println(cmd); // for debug
+    Serial.print(cmd); // for debug
   
   }
   else{

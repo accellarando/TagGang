@@ -13,10 +13,17 @@ def parse_args():
 def send_to_arduino(gcode_command):
 	#print("IN python: send_to_arduino");
 	ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)
-	data = (f"{gcode_command}").encode()
+	gcode_command = gcode_command[0].strip("[]'")
+	data = (f"{gcode_command}\n").encode()
 	print(data);
-	retval = ser.write(data)
-	ser.close()
+	#retval = ser.write(data)
+	#ser.close()
+	
+	# printing data:
+	# b"['G1 L217.503103 R1282.552845\\n']" >> before removing newline in parse_gcode
+	# b"['G1 L217.503103 R1282.552845']" >> before stripping
+	# b'G1 L217.503103 R1282.552845\n' >> CORRECT
+	
     # try:
         # # Open serial connection
         # ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)  # Adjust port and baudrate as needed
