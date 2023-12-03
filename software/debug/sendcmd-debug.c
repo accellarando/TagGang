@@ -35,7 +35,7 @@ static void parse_gcode(){
 
 	char line[512];
 	while(fgets(line, sizeof(line), gcode_file) != NULL){
-		//line[strcspn(line, "\n")] = '\0'; // remove newline char
+		line[strcspn(line, "\n")] = '\0'; // remove newline char
 		int err = send_command(line);
 		if(err != 0)
 			printf("Error from plotter: %d\n", err);
