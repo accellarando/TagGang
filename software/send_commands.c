@@ -4,29 +4,57 @@
  * Read output.gcode, sending one line at a time (terminated with \n).
  * After a line is sent, wait for an "OK" value coming back, or an "Exxx" error code.
  * Once EOF is reached, change title back to the TITLE_CANVAS.
+ * 
+ * TODO:
+ * 		- loading bar that lets you keep track of progress
+ * 		- fix summary
+ * 
+ * @author Dana Escandor
  */
 #include <send_commands.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-#define BUFFER_SIZE 512
+#define BUFFER_SIZE 256 // buffer size for storing command strings
+#define GCODE_FILE_PATH "/home/ella/Desktop/TagGang/software/output.gcode"
+#define PYTHON_SCRIPT_PATH "/home/ella/Desktop/TagGang/software/serialsend.py"
 
-static int send_command(char* cmd){
-	char* python = "python serialsend.py %s";
-	char buffer[BUFFER_SIZE + strlen(python)];
-	sprintf(buffer, python, cmd);
-	int status = system(cmd);
+static GtkWidget *label; // ? static
+
+/**
+ * @brief sends a gcode command via a python script that handles serial read/write
+ * @param gcode command to be sent
+ * @return status of the command execution
+ */ 
+static int send_command(const char* gcode_cmd){
+	// constructs the command to call python script
+	char python_cmd[BUFFER_SIZE];
+	snprintf(python_cmd, sizeof(python_cmd),
+	 "python3 %s \"%s\"", PYTHON_SCRIPT_PATH, gcode_cmd); // python3 vs python?
+	
+	int status = system(python_cmd);
 	return status;
 }
 
-static void parse_gcode(char* filename){
-	FILE *gcode_file = fopen("/home/ella/Desktop/TagGang/software/debug/gtext.gcode", "r");
+/**
+ * @brief parses gcode file and sends gcode commands one line at a time 
+ * to "send_command", printing any errors if any
+ */ 
+static void parse_gcode(){
+	// reads gcode file
+	FILE *gcode_file = fopen(GCODE_FILE_PATH, "r");
 	if(gcode_file == NULL){
 		printf("Error opening gcode file!\n");
 	}
 
-	char line[BUFFER_SIZE];
+	char line[BUFFER_SIZE]; // array to store a line read from the gcode file
+	// reads lines from gcode file until the end is reached
 	while(fgets(line, sizeof(line), gcode_file) != NULL){
-		int err = send_command(line);
+		line[strcspn(line, "\n")] = '\0'; // removes newline char before sending
+		
+		int err = send_command(line); // send parsed gcode command to send_command
 		if(err != 0)
 			printf("Error from plotter: %d\n", err);
 	}
@@ -34,29 +62,30 @@ static void parse_gcode(char* filename){
 	fclose(gcode_file);
 }
 
-static GtkWidget *label;
-
+/**
+ * @brief clears GUI and resets title
+ */
 static void finish_sending_stage() {
-	// Clean up widgets
+	// clean up widgets
 	gtk_widget_destroy(label);
-
-	// Change window title
+	
+	// change window title to loop back to beginning
 	gtk_window_set_title(GTK_WINDOW(window), TITLE_CANVAS);
 }
 
 /**
- * Sets up the GUI for this stage, then starts the file reading/sending process.
+ * @brief sets up the GUI for gcode sender stage, then starts the file reading and parsing
  */
 void activate_plotter(GObject *self, GParamSpec* pspec, gpointer data){
-	// Set up GUI with some placeholder text
-	// TODO: put a loading bar here that lets you keep track of progress. For now, just put some placeholder text.
+	// set up GUI with some placeholder text
 	label = gtk_label_new("Sending over serial!");
     gtk_container_add(GTK_CONTAINER(window), label);
     gtk_widget_show_all(window);
 
-	// Read file line by line, send over serial terminal
-	parse_gcode("output.gcode");
-
+	// read file line by line, send over serial terminal
+	parse_gcode();
+	
+	// reset GUI
 	finish_sending_stage();
 }
 
