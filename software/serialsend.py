@@ -15,38 +15,17 @@ def send_to_arduino(gcode_command):
 	ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)
 	gcode_command = gcode_command[0].strip("[]'")
 	data = (f"{gcode_command}\n").encode()
-	print(data);
-	#retval = ser.write(data)
-	#ser.close()
+	#print(data);
+	retval = ser.write(data)
+	
+	response = ser.readline().decode().strip()
+	print(f"Arduino Response: {response}")
+		
+	ser.close()
 	
 	# printing data:
 	# b"['G1 L217.503103 R1282.552845\\n']" >> before removing newline in parse_gcode
 	# b"['G1 L217.503103 R1282.552845']" >> before stripping
 	# b'G1 L217.503103 R1282.552845\n' >> CORRECT
-	
-    # try:
-        # # Open serial connection
-        # ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)  # Adjust port and baudrate as needed
-
-        # # Send G-code line with a newline character
-        # newCmd = (" ".join(gcode_command)+'\0').encode();
-        # print(newCmd)
-        # #ser.write(bytes(newCmd, 'utf-8'))
-        # ser.write(newCmd)
-
-        # # Wait for the Arduino to process the command (adjust as needed)
-        # time.sleep(.5)
-        # returned = ser.readline()
-        # print(returned.decode().strip())
-        # ser.close()
-        # if returned == "OK\n":
-            # return 0
-        # else:
-            # return returned.decode()
-
-        # # Close the serial port
-    # except Exception as e:
-        # print(f"Error: {e}")
-        # return e
 
 parse_args();
