@@ -266,10 +266,6 @@ void loop(){
   if (Serial.available()){
     String cmd = Serial.readStringUntil('\n'); // quirk: the string has to have a space before \n for some reason?
     Serial.print(cmd); // for debug
-  
-  }
-  else{
-    Serial.println("No serial data available");
   }
 	
 //	int err = exec_command(cmd);
