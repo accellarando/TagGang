@@ -253,28 +253,35 @@ void setup_motors(){
 */
 int i;
 void setup(){
-	Serial.begin(9600); // Start serial communication at 9600 baud
-	Serial.println("Loading TagGang firmware!");
+	Serial.begin(115200); // Start serial communication at 9600 baud
+	//Serial.println("Loading TagGang firmware!");
 
-	setup_motors();
+	//setup_motors();
 
-	Serial.println("OK");
+	//Serial.println("OK");
  i = 0;
 }
 
 void loop(){
-	String cmd = Serial.readStringUntil('\n'); // quirk: the string has to have a space before \n for some reason?
-	Serial.println(cmd); // for debug
-	int err = exec_command(cmd);
-  //int err = 0;
-  //move_motors(50+i++, 50+i++);
-  //delay(5000);
-	if(!err){
-		Serial.println("OK");
-	}
-	else{
-		char response[4];
-		sprintf(response, "E%03d", err);
-		Serial.println(response);
-	}
+  if (Serial.available()){
+    String cmd = Serial.readStringUntil('\n'); // quirk: the string has to have a space before \n for some reason?
+    Serial.println(cmd); // for debug
+  
+  }
+  else{
+    Serial.println("No serial data available");
+  }
+	
+//	int err = exec_command(cmd);
+//  int err = 0;
+//  move_motors(50+i++, 50+i++);
+//  delay(5000);
+//	if(!err){
+//		Serial.println("OK");
+//	}
+//	else{
+//		char response[4];
+//		sprintf(response, "E%03d", err);
+//		Serial.println(response);
+//	}
 }
