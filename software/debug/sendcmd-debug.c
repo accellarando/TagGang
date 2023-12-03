@@ -18,7 +18,7 @@
 static int send_command(char* cmd){
 	// constructs the command to call py script
 	char python_cmd[BUFFER_SIZE];
-	snprintf(python_cmd, sizeof(python_cmd), "python3 %s \"%s\"", PYTHON_SCRIPT_PATH, cmd);
+	int chars_written = snprintf(python_cmd, sizeof(python_cmd), "python3 %s \"%s\"", PYTHON_SCRIPT_PATH, cmd);
 	 
 	if (chars_written < 0 || chars_written >= sizeof(python_cmd)) {
 		fprintf(stderr, "HELP ERROR\n");
@@ -27,9 +27,9 @@ static int send_command(char* cmd){
 	//char* python = "python3 %s \"%s\"";
 	//char buffer[BUFFER_SIZE + strlen(python)];
 	//sprintf(buffer, python, PYTHON_SCRIPT_PATH, cmd);
-	printf("COMMAND %s_\n");
+	printf("%s_", python_cmd);
 	
-	system(cmd);
+	//system(python_cmd);
 
 }
 
