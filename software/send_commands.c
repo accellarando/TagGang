@@ -11,7 +11,7 @@
 #define BUFFER_SIZE 512
 
 static int send_command(char* cmd){
-	char* python = "python serialMotorCMD.py %s";
+	char* python = "python serialsend.py %s";
 	char buffer[BUFFER_SIZE + strlen(python)];
 	sprintf(buffer, python, cmd);
 	int status = system(cmd);
@@ -19,7 +19,7 @@ static int send_command(char* cmd){
 }
 
 static void parse_gcode(char* filename){
-	FILE *gcode_file = fopen("/home/ella/Documents/gtext.gcode", "r");
+	FILE *gcode_file = fopen("/home/ella/Desktop/TagGang/software/debug/gtext.gcode", "r");
 	if(gcode_file == NULL){
 		printf("Error opening gcode file!\n");
 	}

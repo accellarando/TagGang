@@ -7,7 +7,7 @@
 #include <termios.h>
 
 #define SERIAL_PORT "/dev/ttyACM0"
-#define BAUDRATE 9600
+#define BAUDRATE 115200
 #define BUFFER_SIZE 256
 
 int open_serial_port() {

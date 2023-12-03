@@ -5,6 +5,7 @@
 #include <drawable_canvas.h>
 #include <selector.h>
 #include <main.h>
+#include <math.h>
 
 void activate_gcoder(GObject* self,
 		GParamSpec* pspec,
