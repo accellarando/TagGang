@@ -21,7 +21,7 @@
 #define GCODE_FILE_PATH "/home/ella/Desktop/TagGang/software/output.gcode"
 #define PYTHON_SCRIPT_PATH "/home/ella/Desktop/TagGang/software/serialsend.py"
 
-static GtkWidget *label; // ? static
+GtkWidget *label; // ? static
 
 /**
  * @brief sends a gcode command via a python script that handles serial read/write
@@ -79,8 +79,8 @@ static void finish_sending_stage() {
 void activate_plotter(GObject *self, GParamSpec* pspec, gpointer data){
 	// set up GUI with some placeholder text
 	label = gtk_label_new("Sending over serial!");
-    gtk_container_add(GTK_CONTAINER(window), label);
-    gtk_widget_show_all(window);
+    gtk_container_add(GTK_CONTAINER(frame), label);
+    //gtk_widget_show_all(window);
 
 	// read file line by line, send over serial terminal
 	parse_gcode();
