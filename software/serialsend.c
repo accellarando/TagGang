@@ -1,4 +1,16 @@
-// TESTING FILE TO BE INTEGRATED INTO send_commands.c
+/**
+ * send_commands:
+ * 
+ * C script for sending gcode commands to Arduino over serial connection.
+ * Doesn't utilize any serial libraries but a terimos struct
+ * (see serialsend.py for python version).
+ * 
+ * TODO:
+ * 		- fix to contain contents/functionality of send_commands.c
+ * 		- fix summary
+ * 
+ * @author Dana Escandor
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
