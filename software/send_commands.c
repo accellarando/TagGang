@@ -21,7 +21,7 @@
 #define GCODE_FILE_PATH "/home/ella/Desktop/TagGang/software/output.gcode"
 #define PYTHON_SCRIPT_PATH "/home/ella/Desktop/TagGang/software/serialsend.py"
 
-GtkWidget *label; // ? static
+static GtkWidget *label; // ? static
 
 /**
  * @brief sends a gcode command via a python script that handles serial read/write
@@ -47,6 +47,7 @@ static void parse_gcode(){
 	FILE *gcode_file = fopen(GCODE_FILE_PATH, "r");
 	if(gcode_file == NULL){
 		printf("Error opening gcode file!\n");
+		return;
 	}
 
 	char line[BUFFER_SIZE]; // array to store a line read from the gcode file
@@ -67,20 +68,25 @@ static void parse_gcode(){
  */
 static void finish_sending_stage() {
 	// clean up widgets
-	gtk_widget_destroy(label);
+	//gtk_widget_destroy(label);
+	gtk_widget_hide(label);
 	
 	// change window title to loop back to beginning
 	gtk_window_set_title(GTK_WINDOW(window), TITLE_CANVAS);
+}
+
+void setup_plotter(){
+	// set up GUI with some placeholder text
+	label = gtk_label_new("Sending over serial!");
+    gtk_container_add(GTK_CONTAINER(frame), label);
+	gtk_widget_hide(label);
 }
 
 /**
  * @brief sets up the GUI for gcode sender stage, then starts the file reading and parsing
  */
 void activate_plotter(GObject *self, GParamSpec* pspec, gpointer data){
-	// set up GUI with some placeholder text
-	label = gtk_label_new("Sending over serial!");
-    gtk_container_add(GTK_CONTAINER(frame), label);
-    //gtk_widget_show_all(window);
+	gtk_widget_show(label);
 
 	// read file line by line, send over serial terminal
 	parse_gcode();

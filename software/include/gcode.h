@@ -7,6 +7,8 @@
 #include <main.h>
 #include <math.h>
 
+void setup_gcoder();
+
 void activate_gcoder(GObject* self,
 		GParamSpec* pspec,
 		gpointer user_data);

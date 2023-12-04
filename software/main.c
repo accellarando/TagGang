@@ -17,12 +17,31 @@
 #include <string.h>
 
 // Global/shared variables
-// GtkApplication *app;
+GtkApplication *app;
 GtkWidget *window;
+GtkWidget *frame;
+static GtkWidget *canvas_drawing_area;
 // these are declared in the header file as extern but idk if we actually want to share them?
 GFreenectDevice *kinect = NULL; 
 SkeltrackSkeleton *skeleton = NULL;
 gfloat smoothing_factor = 0.0;
+
+void init_frame(){
+	window = gtk_application_window_new (app);
+	gtk_window_set_title (GTK_WINDOW (window), "Draw a picture!");
+	gtk_widget_set_size_request(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+	gtk_container_set_border_width (GTK_CONTAINER (window), 8);
+
+	gtk_widget_show(window);
+
+	// Create the frame
+	frame = gtk_frame_new (NULL);
+	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+	// Add frame to window
+	gtk_container_add (GTK_CONTAINER (window), frame);
+	gtk_widget_show(frame);
+}
+
 
 void scale_point_cloud(GtkApplication *app,
 		gpointer data){
@@ -45,15 +64,20 @@ void signal_router(GtkApplication *app,
 		activate_plotter(app, NULL, data);
 	}
 	else {
+		printf("Activating canvas by default\n");
 		activate_canvas(app, NULL, data);
 	}
 }
 
+
 void activate(GtkApplication *app,
 		gpointer data){
-	window = gtk_application_window_new (app);
-	gtk_window_set_title (GTK_WINDOW (window), "Draw a picture!");
-	gtk_widget_set_size_request(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+	init_frame();
+
+	canvas_drawing_area = setup_canvas();
+	setup_selector();
+	setup_gcoder();
+	setup_plotter();
 
 	// Route signals that the child functions emit by changing window title
 	g_signal_connect (window, "notify::title", G_CALLBACK(signal_router), app);
@@ -187,9 +211,16 @@ static void on_depth_frame (GFreenectDevice *dev, gpointer data){
 	// then, in the draw handler on drawable canvas, it will
 	// draw relevant joints and process them. this sends a new
 	// draw signal hopefully
+	/*
 	if(drawing_area != NULL){
 		if(GTK_IS_WIDGET(drawing_area)){
 			gtk_widget_queue_draw(drawing_area);
+		}
+	}
+	*/
+	if(canvas_drawing_area != NULL){
+		if(GTK_IS_WIDGET(canvas_drawing_area)){
+			gtk_widget_queue_draw(canvas_drawing_area);
 		}
 	}
 }
@@ -312,7 +343,6 @@ gboolean check_for_js_events(gpointer data){
 int main (int    argc,
 		char **argv)
 {
-	GtkApplication *app;
 	int status;
 
 	app = gtk_application_new ("org.taggang.main", G_APPLICATION_FLAGS_NONE);
@@ -330,7 +360,6 @@ int main (int    argc,
 
 	// Set up activation signal handler
 	g_signal_connect (app, "activate", G_CALLBACK (activate), window);
-
 	status = g_application_run (G_APPLICATION (app), argc, argv);
 	gtk_main();
 

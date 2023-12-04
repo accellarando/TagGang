@@ -14,9 +14,7 @@
 #include <drawable_canvas.h>
 
 cairo_surface_t  *surface		= NULL;
-GtkApplication	 *app			= NULL;
-GtkWidget *frame;
-GtkWidget *drawing_area;
+static GtkWidget *drawing_area;
 
 GList* points_list = NULL;
 GList* current_path = NULL;
@@ -43,15 +41,16 @@ static gboolean configure_event_cb (GtkWidget         *widget,
 		GdkEventConfigure *event,
 		gpointer           data)
 {
-	printf("configure\n");
-	if (surface)
-		cairo_surface_destroy (surface);
-
-	surface = gdk_window_create_similar_surface (gtk_widget_get_window (widget),
+	/*
+	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
+			gtk_widget_get_allocated_width (widget),
+			gtk_widget_get_allocated_height (widget));
+			*/
+	
+	surface = gdk_window_create_similar_surface(gtk_widget_get_window (widget),
 			CAIRO_CONTENT_COLOR,
 			gtk_widget_get_allocated_width (widget),
 			gtk_widget_get_allocated_height (widget));
-
 	/* Initialize the surface to white */
 	clear_surface ();
 
@@ -67,8 +66,9 @@ static gboolean draw_cb (GtkWidget *widget,
 		cairo_t   *cr,
 		gpointer   data);
 static void advance_stage(){
-
+	// save their little doodle
 	cairo_surface_write_to_png(surface, "drawing.png");
+
 	// Clear the screen
 	clear_surface();
 
@@ -77,26 +77,13 @@ static void advance_stage(){
 		cairo_surface_destroy (surface);
 		surface = NULL;
 	}
-	/* This segfaults, but if you don't destroy it then the tag selector doesn't show up.
-	 * so like, what the fuck
-	if(frame){
-		gtk_widget_destroy(frame);
-		frame = NULL;
-	}
-	*/
 	if(drawing_area){
 		g_signal_handlers_disconnect_by_func(drawing_area, G_CALLBACK(draw_cb), NULL);
-		gtk_widget_destroy(drawing_area);
-		drawing_area = NULL;
+		//gtk_widget_destroy(drawing_area);
+		gtk_widget_hide(drawing_area);
 	}
-
-	//fuck it let's try it this way
-	//gtk_container_foreach(GTK_CONTAINER(window), destroy_widget, NULL);
-	//still nothing
-
-
 	if(joints_list != NULL)
-		skeltrack_joint_list_free(joints_list); //this segfaults sometimes???? idk.
+		skeltrack_joint_list_free(joints_list); 
 
 	// Change window title to next stage.
 	// This also triggers the signal router for you.
@@ -125,7 +112,6 @@ static gboolean draw_cb (GtkWidget *widget,
 		printf("something was null\n");
 		return FALSE;
 	}
-	printf("draw cb\n");
 	cairo_set_source_surface (cr, surface, 0, 0);
 	cairo_paint (cr);
 
@@ -349,34 +335,35 @@ static void close_window (void)
 		cairo_surface_destroy (surface);
 }
 
-void activate_canvas (GtkApplication *app,
-		void*		i_forgot,
-		gpointer	 user_data)
-{
-	printf("activate_canvas\n");
-	window = (GtkWidget*) user_data;
-
-	g_signal_connect (window, "destroy", G_CALLBACK (close_window), NULL);
-
-	gtk_container_set_border_width (GTK_CONTAINER (window), 8);
-
-	frame = gtk_frame_new (NULL);
-	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
-	gtk_container_add (GTK_CONTAINER (window), frame);
-
+/***
+ * This function initializes widgets and other objects that the 
+ * canvas uses.
+ *
+ * After this is called, call activate_canvas to select this stage
+ * and show all relevant widgets.
+ */
+GtkWidget* setup_canvas(){
 	drawing_area = gtk_drawing_area_new ();
+
 	/* set a minimum size */
 	gtk_widget_set_size_request (drawing_area, 500, 500);
 
 	gtk_container_add (GTK_CONTAINER (frame), drawing_area);
 
-	/* Signals used to handle the backing surface */
+	/*
+	surface = gdk_window_create_similar_surface (gtk_widget_get_window (frame),
+			CAIRO_CONTENT_COLOR,
+			gtk_widget_get_allocated_width (frame),
+			gtk_widget_get_allocated_height (frame));
+			*/
+
+	// Signals used to handle the backing surface
 	g_signal_connect (drawing_area, "draw",
 			G_CALLBACK (draw_cb), NULL);
 	g_signal_connect (drawing_area,"configure-event",
 			G_CALLBACK (configure_event_cb), NULL);
 
-	/* Event signals */
+	// Event signals
 	g_signal_connect (drawing_area, "motion-notify-event",
 			G_CALLBACK (motion_notify_event_cb), NULL);
 	g_signal_connect (drawing_area, "button-press-event",
@@ -384,15 +371,27 @@ void activate_canvas (GtkApplication *app,
 	g_signal_connect (drawing_area, "button-release-event",
 			G_CALLBACK (button_release_event_cb), NULL);
 
-	/* Ask to receive events the drawing area doesn't normally
-	 * subscribe to. In particular, we need to ask for the
-	 * button press and motion notify events that want to handle.
-	 */
+	// Ask to receive events the drawing area doesn't normally
+	// subscribe to. In particular, we need to ask for the
+	// button press and motion notify events that want to handle.
+	// unrealize drawing area first
+	gtk_widget_unrealize(drawing_area);
 	gtk_widget_set_events (drawing_area, gtk_widget_get_events (drawing_area)
 			| GDK_BUTTON_PRESS_MASK
 			| GDK_BUTTON_RELEASE_MASK
 			| GDK_POINTER_MOTION_MASK);
-
-	gtk_widget_show_all (window);
+	gtk_widget_realize(drawing_area);
+	//gtk_widget_hide(drawing_area);
+	return drawing_area;
 }
 
+void activate_canvas (GtkApplication *app,
+		void*		pspspscpscpskj,
+		gpointer	 user_data)
+{
+	// Show drawing area
+	printf("showing drawing_area\n");
+	gtk_widget_show(drawing_area);
+	gtk_widget_show(frame);
+	clear_surface();
+}

@@ -38,38 +38,6 @@ static void destroy_widget(GtkWidget* widget, gpointer data){
 	gtk_widget_destroy(widget);
 }
 
-void activate_selector(  GtkApplication* self,
-		GParamSpec* pspec,
-  gpointer user_data){
-
-	// make sure window is empty
-	//gtk_container_foreach(GTK_CONTAINER(window), destroy_widget, NULL);
-
-    // Create a vertical box to hold the drawing area and image display area
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_container_add(GTK_CONTAINER(frame), vbox);
-
-    // Create drawing area
-    selector_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(selector_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
-    gtk_box_pack_start(GTK_BOX(vbox), selector_area, TRUE, TRUE, 0);
-
-    // Create image display area
-    image_display_area = gtk_image_new();
-    gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
-    gtk_box_pack_start(GTK_BOX(vbox), image_display_area, TRUE, TRUE, 0);
-
-    // Load and set the image
-    load_and_set_image();
-
-    // Connect signals to callback functions
-    g_signal_connect(G_OBJECT(selector_area), "draw", G_CALLBACK(on_draw), NULL);
-    g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press), NULL);
-
-    gtk_widget_set_events(window, GDK_KEY_PRESS_MASK);
-    gtk_widget_show_all(window);
-	printf("Selector should be active now.\n");
-}
 
 /* Draws a selector box onto the drawing area (using Cairo API) */
 static void draw_selector(cairo_t *cr, int x, int y) {
@@ -252,3 +220,37 @@ static void load_and_set_image() {
     }
 }
 
+void setup_selector(){
+    // Create a vertical box to hold the drawing area and image display area
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
+
+    // Create drawing area
+    selector_area = gtk_drawing_area_new();
+    gtk_widget_set_size_request(selector_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+    gtk_box_pack_start(GTK_BOX(vbox), selector_area, TRUE, TRUE, 0);
+
+    // Create image display area
+    image_display_area = gtk_image_new();
+    gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+    gtk_box_pack_start(GTK_BOX(vbox), image_display_area, TRUE, TRUE, 0);
+
+	// hide these bitches
+	gtk_widget_hide(vbox);
+	gtk_widget_hide(image_display_area);
+
+	// Connect signals to callback functions
+	g_signal_connect(G_OBJECT(vbox), "draw", G_CALLBACK(on_draw), NULL);
+	g_signal_connect(vbox, "key-press-event", G_CALLBACK(on_key_press), NULL);
+}
+
+void activate_selector(  GtkApplication* self,
+		GParamSpec* pspec,
+  gpointer user_data){
+
+    // Load and set the image
+    load_and_set_image();
+
+    gtk_widget_show_all(window);
+	printf("Selector should be active now.\n");
+}

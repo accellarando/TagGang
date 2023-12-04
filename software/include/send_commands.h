@@ -12,6 +12,8 @@
 #define WINDOW_WIDTH 800 // Increased window width to accommodate the image display area
 #define WINDOW_HEIGHT 500
 
+void setup_plotter();
+
 void activate_plotter(GObject* self,
 		GParamSpec* pspec,
   gpointer user_data);

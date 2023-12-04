@@ -1,0 +1,1 @@
+Custom hardware and software extend functionalities of a Raspberry Pi and Arduino AVR chip to control a cable-driven gondola pen-plotter.

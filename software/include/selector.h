@@ -18,4 +18,6 @@ void activate_selector(GtkApplication* self,
 		GParamSpec* pspec,
   gpointer user_data);
 
+void setup_selector();
+
 #endif

@@ -4,6 +4,8 @@
 #include <gtk/gtk.h>
 #include <drawable_canvas.h>
 #include <selector.h>
+#include <send_commands.h>
+#include <gcode.h>
 
 // Kinect support
 #include <gfreenect.h>
@@ -23,7 +25,10 @@
 #define JOY_POLL_PERIOD 100 // ms to poll joystick for data
 
 // Shared variables
+extern GtkApplication *app;
 extern GtkWidget *window;
+extern GtkWidget *frame;
+
 extern GFreenectDevice *kinect;
 extern SkeltrackSkeleton *skeleton;
 extern volatile int joy_available;

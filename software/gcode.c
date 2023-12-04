@@ -97,21 +97,25 @@ void transform_paths(GList* points, double motor_distance){
 	}
 }
 
-GtkWidget *label;
+static GtkWidget *label;
 
 void finish_stage() {
-	gtk_widget_destroy(label);
+	//gtk_widget_destroy(label);
+	gtk_widget_hide(label);
 
 	gtk_window_set_title(GTK_WINDOW(window), TITLE_PLOTTER);
 }
 
-void activate_gcoder(GObject* self,
-		GParamSpec* property, gpointer data) {
-
+void setup_gcoder() {
 	// todo: put a loading bar here that lets you keep track of progress. For now, just put some placeholder text.
 	label = gtk_label_new("Generating gcode!");
     gtk_container_add(GTK_CONTAINER(frame), label);
-    //gtk_widget_show_all(window);
+	gtk_widget_hide(label);
+}
+
+void activate_gcoder(GObject* self,
+		GParamSpec* property, gpointer data) {
+	gtk_widget_show(label);
 
 	scale_paths(points_list, 10, 10);
 
