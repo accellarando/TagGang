@@ -20,6 +20,7 @@ GList* points_list = NULL;
 GList* current_path = NULL;
 static gdouble last_x = -1.0;
 static gdouble last_y = -1.0;
+static volatile int stage_active = 0;
 static void draw_brush (GtkWidget *widget, gdouble x, gdouble y);
 
 /***
@@ -83,6 +84,7 @@ static void advance_stage(){
 
 	// Change window title to next stage.
 	// This also triggers the signal router for you.
+	stage_active = 0;
 	gtk_window_set_title(window, TITLE_SELECTOR);
 }
 /* Redraw the screen from the surface. Note that the ::draw
@@ -115,7 +117,7 @@ static gboolean draw_cb (GtkWidget *widget,
 	GError *error = NULL;
 
 	// Process if pen is up or down
-	if(btn_available){
+	if(btn_available && stage_active){
 		if(event.number == BTN_RIGHT_A){
 			pen_down = event.value;
 			// button up: finish path
@@ -131,7 +133,8 @@ static gboolean draw_cb (GtkWidget *widget,
 			clear_surface ();
 			gtk_widget_queue_draw (widget);
 		}
-		if(event.number == BTN_RIGHT_Y){
+		if(event.number == BTN_RIGHT_Y 
+				&& event.value == 1){
 			btn_available = 0;
 			advance_stage();
 			printf("Advancing stage\n");
@@ -383,6 +386,10 @@ void activate_canvas (GtkApplication *app,
 		void*		pspspscpscpskj,
 		gpointer	 user_data)
 {
+	// Resize window
+	gtk_widget_set_size_request(vbox, WINDOW_WIDTH, WINDOW_HEIGHT);
+	gtk_window_resize(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+
 	// Show drawing area
 	printf("showing drawing_area\n");
 	configure_event_cb (drawing_area, NULL, NULL);
@@ -394,4 +401,5 @@ void activate_canvas (GtkApplication *app,
 	gtk_widget_show(vbox);
 
 	clear_surface();
+	stage_active = 1;
 }

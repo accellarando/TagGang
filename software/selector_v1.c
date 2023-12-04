@@ -99,6 +99,7 @@ static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
 	// Check if we need to finish selector stage
 	if(btn_available == 1 && event.type == JS_EVENT_BUTTON && event.number == BTN_RIGHT_Y && event.value == 1){
 		// Finish up
+		btn_available = 0;
 		if(last_joy_time != 0){
 			save_coordinates(box_x, box_y);
 			finish_selector_stage();
