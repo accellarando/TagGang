@@ -19,7 +19,8 @@
 // Global/shared variables
 GtkApplication *app;
 GtkWidget *window;
-GtkWidget *frame;
+static GtkWidget *frame;
+GtkWidget *vbox;
 static GtkWidget *canvas_drawing_area;
 // these are declared in the header file as extern but idk if we actually want to share them?
 GFreenectDevice *kinect = NULL; 
@@ -40,6 +41,10 @@ void init_frame(){
 	// Add frame to window
 	gtk_container_add (GTK_CONTAINER (window), frame);
 	gtk_widget_show(frame);
+
+    // Create a vertical box to hold the drawing area and image display area
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
 }
 
 

@@ -24,10 +24,17 @@
 
 #define JOY_POLL_PERIOD 100 // ms to poll joystick for data
 
+#define JOY_RIGHT_X 0
+#define JOY_RIGHT_Y 1
+
+#define DEADZONE 4000
+
+#define JOY_SPEED 4.0 
+
 // Shared variables
 extern GtkApplication *app;
 extern GtkWidget *window;
-extern GtkWidget *frame;
+extern GtkWidget *vbox;
 
 extern GFreenectDevice *kinect;
 extern SkeltrackSkeleton *skeleton;
@@ -62,11 +69,5 @@ typedef enum {
 	BTN_RIGHT_NONE
 } JoyButton;
 
-#define JOY_RIGHT_X 0
-#define JOY_RIGHT_Y 1
-
-#define DEADZONE 4000
-
-#define JOY_SPEED 4.0 
 
 #endif

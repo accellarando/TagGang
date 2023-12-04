@@ -100,7 +100,6 @@ void transform_paths(GList* points, double motor_distance){
 static GtkWidget *label;
 
 void finish_stage() {
-	//gtk_widget_destroy(label);
 	gtk_widget_hide(label);
 
 	gtk_window_set_title(GTK_WINDOW(window), TITLE_PLOTTER);
@@ -109,7 +108,8 @@ void finish_stage() {
 void setup_gcoder() {
 	// todo: put a loading bar here that lets you keep track of progress. For now, just put some placeholder text.
 	label = gtk_label_new("Generating gcode!");
-    gtk_container_add(GTK_CONTAINER(frame), label);
+    //gtk_container_add(GTK_CONTAINER(frame), label);
+	gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
 	gtk_widget_hide(label);
 }
 

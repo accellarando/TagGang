@@ -58,10 +58,6 @@ static gboolean configure_event_cb (GtkWidget         *widget,
 	return TRUE;
 }
 
-static void destroy_widget(GtkWidget* widget, gpointer data){
-	gtk_widget_destroy(widget);
-}
-
 static gboolean draw_cb (GtkWidget *widget,
 		cairo_t   *cr,
 		gpointer   data);
@@ -267,8 +263,10 @@ static gboolean button_press_event_cb (GtkWidget      *widget,
 		gpointer        data)
 {
 	/* paranoia check, in case we haven't gotten a configure event */
-	if (surface == NULL)
+	if (surface == NULL){
+		printf("Something was null\n");
 		return FALSE;
+	}
 
 	g_print("Button pressed: %d\n", event->button);
 	if (event->button == BUTTON_PEN_DOWN)
@@ -319,8 +317,10 @@ static gboolean motion_notify_event_cb (GtkWidget      *widget,
 		gpointer        data)
 {
 	/* paranoia check, in case we haven't gotten a configure event */
-	if (surface == NULL)
+	if (surface == NULL){
+		printf("somethingg was null\n");
 		return FALSE;
+	}
 
 	if (event->state & GDK_BUTTON1_MASK)
 		draw_brush (widget, event->x, event->y);
@@ -348,14 +348,7 @@ GtkWidget* setup_canvas(){
 	/* set a minimum size */
 	gtk_widget_set_size_request (drawing_area, 500, 500);
 
-	gtk_container_add (GTK_CONTAINER (frame), drawing_area);
-
-	/*
-	surface = gdk_window_create_similar_surface (gtk_widget_get_window (frame),
-			CAIRO_CONTENT_COLOR,
-			gtk_widget_get_allocated_width (frame),
-			gtk_widget_get_allocated_height (frame));
-			*/
+	gtk_box_pack_start(GTK_BOX(vbox), drawing_area, TRUE, TRUE, 0);
 
 	// Signals used to handle the backing surface
 	g_signal_connect (drawing_area, "draw",
@@ -374,14 +367,15 @@ GtkWidget* setup_canvas(){
 	// Ask to receive events the drawing area doesn't normally
 	// subscribe to. In particular, we need to ask for the
 	// button press and motion notify events that want to handle.
-	// unrealize drawing area first
+
+	// unrealize drawing area first for some reason
 	gtk_widget_unrealize(drawing_area);
 	gtk_widget_set_events (drawing_area, gtk_widget_get_events (drawing_area)
 			| GDK_BUTTON_PRESS_MASK
 			| GDK_BUTTON_RELEASE_MASK
 			| GDK_POINTER_MOTION_MASK);
 	gtk_widget_realize(drawing_area);
-	//gtk_widget_hide(drawing_area);
+	gtk_widget_hide(drawing_area);
 	return drawing_area;
 }
 
@@ -391,7 +385,13 @@ void activate_canvas (GtkApplication *app,
 {
 	// Show drawing area
 	printf("showing drawing_area\n");
+	configure_event_cb (drawing_area, NULL, NULL);
+
+	g_signal_connect (drawing_area, "draw",
+			G_CALLBACK (draw_cb), NULL);
+
 	gtk_widget_show(drawing_area);
-	gtk_widget_show(frame);
+	gtk_widget_show(vbox);
+
 	clear_surface();
 }

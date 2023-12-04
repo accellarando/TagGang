@@ -78,7 +78,8 @@ static void finish_sending_stage() {
 void setup_plotter(){
 	// set up GUI with some placeholder text
 	label = gtk_label_new("Sending over serial!");
-    gtk_container_add(GTK_CONTAINER(frame), label);
+    //gtk_container_add(GTK_CONTAINER(frame), label);
+	gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
 	gtk_widget_hide(label);
 }
 
