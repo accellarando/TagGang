@@ -3,7 +3,8 @@
  *
  * TODO:
  *		- Testing
- *		- Figure out x_scale and y_scale for scale_paths, or implement a different strategy
+ *		- May be a good idea to check that each point is within bounds.
+ *			(they should be, but just in case...)
  *		- Loading bar? (stretch goal)
  *
  * @author Ella Moss
@@ -59,21 +60,24 @@ void paths_to_gcode_file(GList* points, char* filename){
 	fclose(file);
 }
 
-void scale_paths(GList* points, double x_factor, double y_factor) {
+// Transform from screen width to canvas width, NO preservation of aspect ratio
+void scale_paths(GList* points) {
+	gdouble x_factor = ((gdouble)CANVAS_WIDTH) / ((gdouble) WINDOW_WIDTH);
+	gdouble y_factor = ((gdouble)CANVAS_HEIGHT) / ((gdouble)WINDOW_HEIGHT);
 	GList* current = points;
 	// First path contains the starting coordinate
 	GList *first_path = ((GList*) current->data);
-	gdouble start_x = ((DoublePoint*) (first_path->data))->x;
-	gdouble start_y = ((DoublePoint*) (first_path->data))->y;
+	gdouble start_x = ((DoublePoint*) (first_path->data))->x * x_factor;
+	gdouble start_y = ((DoublePoint*) (first_path->data))->y * y_factor;
 	current = current->next;
 
 	while (current != NULL) {
 		GList *this_path = ((GList*) current->data);
 		while(this_path != NULL){
 			DoublePoint* point = (DoublePoint*) this_path->data;
-			point->x /= x_factor;
+			point->x *= x_factor;
 			point->x += start_x;
-			point->y /= y_factor;
+			point->y *= y_factor;
 			point->y += start_y;
 			this_path = this_path->next;
 		}
@@ -81,6 +85,9 @@ void scale_paths(GList* points, double x_factor, double y_factor) {
 	}
 }
 
+/***
+ * Transform Cartesian (x, y) pointx into stepper motor (l, r) points.
+ */
 void transform_paths(GList* points, double motor_distance){
 	GList* current = points;
 	while(current != NULL){
@@ -117,7 +124,7 @@ void activate_gcoder(GObject* self,
 		GParamSpec* property, gpointer data) {
 	gtk_widget_show(label);
 
-	scale_paths(points_list, 10, 10);
+	scale_paths(points_list);
 
 	transform_paths(points_list, MOTOR_DISTANCE);
 

@@ -18,10 +18,12 @@
 #include <unistd.h>
 
 #define BUFFER_SIZE 256 // buffer size for storing command strings
-#define GCODE_FILE_PATH "/home/ella/Desktop/TagGang/software/output.gcode"
-#define PYTHON_SCRIPT_PATH "/home/ella/Desktop/TagGang/software/serialsend.py"
+//#define GCODE_FILE_PATH "/home/ella/Desktop/TagGang/software/output.gcode"
+#define GCODE_FILE_PATH "output.gcode"
+//#define PYTHON_SCRIPT_PATH "/home/ella/Desktop/TagGang/software/serialsend.py"
+#define PYTHON_SCRIPT_PATH "serialsend.py"
 
-static GtkWidget *label; // ? static
+static GtkWidget *label; 
 
 /**
  * @brief sends a gcode command via a python script that handles serial read/write
@@ -32,7 +34,7 @@ static int send_command(const char* gcode_cmd){
 	// constructs the command to call python script
 	char python_cmd[BUFFER_SIZE];
 	snprintf(python_cmd, sizeof(python_cmd),
-	 "python3 %s \"%s\"", PYTHON_SCRIPT_PATH, gcode_cmd); // python3 vs python?
+			"python3 %s \"%s\"", PYTHON_SCRIPT_PATH, gcode_cmd); // python3 vs python?
 	
 	int status = system(python_cmd);
 	return status;

@@ -59,22 +59,15 @@ int pen_up(){
 	penServo.detach();
 }
 
-// measure what these need to be
-#define MIN_L 00
-#define MIN_R 00
-#define START_L 100
-#define START_R 100
-int lastL = START_L; 
-int lastR = START_R;
+// These have been measured as a viable homing position
+#define START_L 600
+#define START_R 600
+double lastL = START_L; 
+double lastR = START_R;
 // Move to absolute position
 int move_motors(double l, double r){
-	if(l<MIN_L)
-		return -1;
-	if(r<MIN_R)
-		return -2;
-
-	int dl = l - lastL;
-	int dr = r - lastR;
+	double dl = l - lastL;
+	double dr = r - lastR;
 
 	// Convert l and r to motor steps
 	int lSteps = dl / MM_PER_STEP;
@@ -84,33 +77,53 @@ int move_motors(double l, double r){
 	lSteps *= 8;
 	rSteps *= 8;
 
-  int lStepsDone = 0;
-  int rStepsDone = 0;
-  while(lStepsDone != lSteps && rStepsDone != rSteps){
-      digitalWrite(ENABLE_PIN_L, HIGH);
-      digitalWrite(ENABLE_PIN_R, HIGH);
-      if(lStepsDone < lSteps){
-        //Serial.println("Stepping L up");
-        motorL.step(8);
-        lStepsDone += 8;
-      }
-      else if(lStepsDone > lSteps){
-        //Serial.println("Stepping L down");
-        motorL.step(-8);
-        lStepsDone -= 8;
-      }
-      if(rStepsDone < rSteps){
-        motorR.step(8);
-        rStepsDone += 8;
-      }
-      else if(rStepsDone > rSteps){
-        motorR.step(-8);
-        rStepsDone -= 8;
-      }
-      //motorR.step(8);
-      digitalWrite(ENABLE_PIN_L, LOW);
-      digitalWrite(ENABLE_PIN_R, LOW);
+  double lrRatio = ((double)lSteps) / ((double)rSteps);
+  int lStepsPerStep = 0;
+  int rStepsPerStep = 0;
+  if(lrRatio < 1){ //left has fewer steps
+    lStepsPerStep = 8 / lrRatio;
+    rStepsPerStep = 8 * lrRatio;
   }
+  else{
+    lStepsPerStep = 8 * lrRatio;
+    rStepsPerStep = 8 / lrRatio;
+  }
+
+	int lStepsDone = 0;
+	int rStepsDone = 0;
+	while(lStepsDone != lSteps || rStepsDone != rSteps){
+		digitalWrite(ENABLE_PIN_L, HIGH);
+		digitalWrite(ENABLE_PIN_R, HIGH);
+		if(lStepsDone < lSteps){
+			//Serial.println("Stepping L up");
+      if(lSteps - lStepsDone <= 8){
+        while(lSteps - lStepsDone > 0){
+          motorL.step(1);
+          lStepsDone += 1;
+        }
+      }
+      else{
+			  motorL.step(lStepsPerStep);
+			  lStepsDone += lStepsPerStep;
+		  }
+		}
+		else if(lStepsDone > lSteps){
+			//Serial.println("Stepping L down");
+			motorL.step(-8);
+			lStepsDone -= 8;
+		}
+		if(rStepsDone < rSteps){
+			motorR.step(-8);
+			rStepsDone += 8;
+		}
+		else if(rStepsDone > rSteps){
+			motorR.step(8);
+			rStepsDone -= 8;
+		}
+		//motorR.step(8);
+		digitalWrite(ENABLE_PIN_L, LOW);
+		digitalWrite(ENABLE_PIN_R, LOW);
+	}
 	// Move motors
 	// TODO: some sort of safety here to make sure neither goes negative?
 	//motorL.moveTo(lSteps); // these are absolute positions, not relative
@@ -133,8 +146,8 @@ int send_command(CommandType cmdType, double lz, double r){
 	char buffer[10];
 	sprintf(buffer, "%d %f %f", cmdType, lz, r);
 	Serial.println(buffer);
-  Serial.println(lz, 2);
-  Serial.println(r, 2);
+	Serial.println(lz, 2);
+	Serial.println(r, 2);
 	return 0;
 #else
 	switch(cmdType){
@@ -149,7 +162,9 @@ int send_command(CommandType cmdType, double lz, double r){
 				return pen_up();
 			}
 			break;
-		//TODO: implement G28 (homing function)
+			//TODO: implement G28 (homing function)
+		case CMD_G28:
+			return move_motors(START_L, START_R);
 		default:
 			return 5;
 	}
@@ -178,20 +193,17 @@ int exec_command(String cmd){
 				int i = 0;
 				for(int j=0; j<2; j++){
 					char point[10];
-          memset(point, 0, sizeof(point));
-          i = 0;
-          Serial.println(point);
+					memset(point, 0, sizeof(point));
+					i = 0;
+					Serial.println(point);
 					while(cmd[strPos] != ' ' && cmd[strPos] != '\n'){
 						point[i] = cmd[strPos];
 						strPos++;
 						i++;
 					}
-          Serial.println(point);
 					points[j] = String(point).toDouble();
-          Serial.println(points[j], 1);
 					strPos += 2; //skip the space and letter if applicable
 				}
-        //Serial.println("points: %f %f", points[0], points[1]);
 				return send_command(CMD_G1LR, points[0], points[1]);
 			}
 			else if(cmd[3] == 'Z'){
@@ -250,34 +262,33 @@ void setup_motors(){
 
 /**
  * Set up motors and pins, then send OK when read
-*/
-int i;
+ */
 void setup(){
 	Serial.begin(115200); // Start serial communication at 9600 baud
-	//Serial.println("Loading TagGang firmware!");
+	Serial.println("Loading TagGang firmware!");
 
-	//setup_motors();
+	setup_motors();
 
-	//Serial.println("OK");
- //i = 0;
+	Serial.println("OK");
 }
 
 void loop(){
-  if (Serial.available()){
-    String cmd = Serial.readStringUntil('\n'); // quirk: the string has to have a space before \n for some reason?
-    Serial.print(cmd); // for debug
-  }
+	if (Serial.available()){
+		String cmd = Serial.readStringUntil('\n'); // quirk: the string has to have a space before \n for some reason?
+		Serial.print(cmd); // for debug
 	
-//	int err = exec_command(cmd);
-//  int err = 0;
-//  move_motors(50+i++, 50+i++);
-//  delay(5000);
-//	if(!err){
-//		Serial.println("OK");
-//	}
-//	else{
-//		char response[4];
-//		sprintf(response, "E%03d", err);
-//		Serial.println(response);
-//	}
+
+	int err = exec_command(cmd);
+	//  int err = 0;
+	//  move_motors(50+i++, 50+i++);
+	//  delay(5000);
+	if(!err){
+		Serial.println("OK");
+	}
+	else{
+		char response[4];
+		sprintf(response, "E%03d", err);
+		Serial.println(response);
+	}
+	}
 }

@@ -17,8 +17,6 @@
 #define TITLE_GCODER "Confirm"
 #define TITLE_PLOTTER "Plotting!"
 
-#define MOTOR_DISTANCE 1499 //mm, ie 59"
-
 #define THRESHOLD_BEGIN 500
 #define THRESHOLD_END 1500 
 

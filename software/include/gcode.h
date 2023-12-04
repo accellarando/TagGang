@@ -7,6 +7,18 @@
 #include <main.h>
 #include <math.h>
 
+// Canvas setup, all in mm
+#define CUTOFF_TOP 175
+#define CUTOFF_BOTTOM 1100
+// I made up these last two lmao, may take some trial and error
+#define CUTOFF_LEFT 100
+#define CUTOFF_RIGHT 100
+
+#define MOTOR_DISTANCE 1150
+
+#define CANVAS_WIDTH (MOTOR_DISTANCE - CUTOFF_LEFT - CUTOFF_RIGHT)
+#define CANVAS_HEIGHT (CUTOFF_BOTTOM - CUTOFF_TOP)
+
 void setup_gcoder();
 
 void activate_gcoder(GObject* self,

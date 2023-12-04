@@ -26,16 +26,22 @@ def parse_args():
 parses command-line argument sent from send_commands.c to be args for send_to_arduino
 """
 def send_to_arduino(gcode_command):
-	ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1) # set up serial connection
+	ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=10) # set up serial connection
 	
-	gcode_command = gcode_command[0].strip("[]'") # remove array notation
-	data = (f"{gcode_command}\n").encode() # encode bytes for serial to read properly
-	#print(data);
+	response = ser.readline().decode().strip()
+	#while(len(response) != 0):
+		#print(f"Arduino Response: {response}")
+		#response = ser.readline().decode().strip()
+	gcode_command = " ".join(gcode_command)
+	data = (f"{gcode_command} \n").encode() # encode bytes for serial to read properly
+	print(data);
 	retval = ser.write(data) # send data to via serial Arduino
-	
-	response = ser.readline().decode().strip() # decode bytes received back from serial
+	response = ser.readline().decode().strip()
 	print(f"Arduino Response: {response}")
-		
+	#response = ser.readline().decode().strip()
+	#while(len(response) != 0):
+		#print(f"Arduino Response: {response}")
+		#response = ser.readline().decode().strip()
 	ser.close()
 	
 	# (debugging) printing data:
