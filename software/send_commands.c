@@ -69,8 +69,6 @@ static void parse_gcode(){
  * @brief clears GUI and resets title
  */
 static void finish_sending_stage() {
-	// clean up widgets
-	//gtk_widget_destroy(label);
 	gtk_widget_hide(label);
 	
 	// change window title to loop back to beginning
@@ -90,6 +88,8 @@ void setup_plotter(){
  */
 void activate_plotter(GObject *self, GParamSpec* pspec, gpointer data){
 	gtk_widget_show(label);
+	// Redraw
+	gtk_widget_queue_draw(window);
 
 	// read file line by line, send over serial terminal
 	parse_gcode();
