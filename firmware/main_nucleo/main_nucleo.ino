@@ -36,8 +36,11 @@ typedef enum{
 
 Servo penServo;
 
-Stepper motorL(200, DIR_PIN_L, STEP_PIN_L);
-Stepper motorR(200, DIR_PIN_R, STEP_PIN_R);
+AccelStepper motorL(AccelStepper::DRIVER, STEP_PIN_L, DIR_PIN_L);
+AccelStepper motorR(AccelStepper::DRIVER, STEP_PIN_R, DIR_PIN_R);
+
+// Use the MultiStepper library to control these guys
+MultiStepper plotter;
 
 /**
  * Directions or angles may be wrong in either of these functions.
@@ -66,72 +69,13 @@ double lastL = START_L;
 double lastR = START_R;
 // Move to absolute position
 int move_motors(double l, double r){
-	double dl = l - lastL;
-	double dr = r - lastR;
+	double position[2] = {l, r};
+	plotter.moveTo(position);
+	lastL = l; // not sure if we actually need these
+	lastR = r;
+	while(plotter.run())
+		; // run until done
 
-	// Convert l and r to motor steps
-	int lSteps = dl / MM_PER_STEP;
-	int rSteps = dr / MM_PER_STEP;
-
-	// Each motor step needs 8 clock signals
-	lSteps *= 8;
-	rSteps *= 8;
-
-  double lrRatio = ((double)lSteps) / ((double)rSteps);
-  int lStepsPerStep = 0;
-  int rStepsPerStep = 0;
-  if(lrRatio < 1){ //left has fewer steps
-    lStepsPerStep = 8 / lrRatio;
-    rStepsPerStep = 8 * lrRatio;
-  }
-  else{
-    lStepsPerStep = 8 * lrRatio;
-    rStepsPerStep = 8 / lrRatio;
-  }
-
-	int lStepsDone = 0;
-	int rStepsDone = 0;
-	while(lStepsDone != lSteps || rStepsDone != rSteps){
-		digitalWrite(ENABLE_PIN_L, HIGH);
-		digitalWrite(ENABLE_PIN_R, HIGH);
-		if(lStepsDone < lSteps){
-			//Serial.println("Stepping L up");
-      if(lSteps - lStepsDone <= 8){
-        while(lSteps - lStepsDone > 0){
-          motorL.step(1);
-          lStepsDone += 1;
-        }
-      }
-      else{
-			  motorL.step(lStepsPerStep);
-			  lStepsDone += lStepsPerStep;
-		  }
-		}
-		else if(lStepsDone > lSteps){
-			//Serial.println("Stepping L down");
-			motorL.step(-8);
-			lStepsDone -= 8;
-		}
-		if(rStepsDone < rSteps){
-			motorR.step(-8);
-			rStepsDone += 8;
-		}
-		else if(rStepsDone > rSteps){
-			motorR.step(8);
-			rStepsDone -= 8;
-		}
-		//motorR.step(8);
-		digitalWrite(ENABLE_PIN_L, LOW);
-		digitalWrite(ENABLE_PIN_R, LOW);
-	}
-	// Move motors
-	// TODO: some sort of safety here to make sure neither goes negative?
-	//motorL.moveTo(lSteps); // these are absolute positions, not relative
-	//motorR.moveTo(rSteps);
-
-
-	lastL += dl;
-	lastR += dr;
 	return 0;
 }
 
@@ -256,8 +200,10 @@ void setup_motors(){
 	digitalWrite(CONTROL_PIN_L, LOW);
 	digitalWrite(CONTROL_PIN_R, LOW);
 
-	motorL.setSpeed(100); // may need to change this param
-	motorR.setSpeed(100); // may need to change this param
+	motorL.setSpeed(200); // may need to change this param
+	motorR.setSpeed(200); // may need to change this param
+	plotter.addStepper(motorL);
+	plotter.addStepper(motorR);
 }
 
 /**

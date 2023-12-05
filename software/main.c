@@ -27,11 +27,17 @@ GFreenectDevice *kinect = NULL;
 SkeltrackSkeleton *skeleton = NULL;
 gfloat smoothing_factor = 0.0;
 
+void on_destroy(GtkWidget *widget, gpointer data){
+	printf("On destroy running\n");
+	g_application_quit((GtkApplication*)data);
+}
+
 void init_frame(){
 	window = gtk_application_window_new (app);
 	gtk_window_set_title (GTK_WINDOW (window), "Draw a picture!");
 	gtk_widget_set_size_request(window, WINDOW_WIDTH, WINDOW_HEIGHT);
 	gtk_container_set_border_width (GTK_CONTAINER (window), 8);
+	g_signal_connect (window, "destroy", G_CALLBACK (on_destroy), app);
 
 	gtk_widget_show(window);
 
@@ -366,7 +372,6 @@ int main (int    argc,
 	// Set up activation signal handler
 	g_signal_connect (app, "activate", G_CALLBACK (activate), window);
 	status = g_application_run (G_APPLICATION (app), argc, argv);
-	gtk_main();
 
 	g_object_unref (app);
 	close(joystick_fd);
