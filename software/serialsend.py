@@ -9,6 +9,7 @@ Utilizes pyserial library for easier integration (see serialsend.c for C version
 import sys
 import serial
 import time
+import termios
 
 """
 parses command-line argument sent from send_commands.c to call send_to_arduino
@@ -18,17 +19,31 @@ def parse_args():
     if len(sys.argv) < 2:
         return -1
     #print(sys.argv[1:]);
-    send_to_arduino(sys.argv[1:])
+    return send_to_arduino(sys.argv[1:])
     #returned = send_to_arduino(sys.argv[1:])
     #print(f"returned: {returned}")
 
 """
 parses command-line argument sent from send_commands.c to be args for send_to_arduino
+
+see https://stackoverflow.com/questions/15460865/disable-dtr-in-pyserial-from-code
+(we have to disable the DTR pulse or the Arduino resets)
 """
 def send_to_arduino(gcode_command):
-    ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=10) # set up serial connection
+    port = '/dev/ttyACM0'
+    f = open(port)
+    attrs = termios.tcgetattr(f)
+    attrs[2] = attrs[2] & ~termios.HUPCL
+    termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
+    f.close()
+    ser = serial.Serial()
+    ser.baudrate = 9600
+    ser.port = port
+    ser.timeout = 20 # may need to change this value
+    ser.open()
 
-    response = ser.readline().decode().strip()
+    #response = ser.readline().decode().strip()
+    #response = ser.readline().decode().strip()
     #while(len(response) != 0):
         #print(f"Arduino Response: {response}")
         #response = ser.readline().decode().strip()
@@ -37,10 +52,18 @@ def send_to_arduino(gcode_command):
     print(data);
     retval = ser.write(data) # send data to via serial Arduino
     response = ser.readline().decode().strip()
+    error = 0
     while(len(response) != 0):
         print(f"Arduino Response: {response}")
+        if response[0] == "O":
+            error = 0
+            break
+        elif response[0] == "E":
+            error = response[1:]
+            break
         response = ser.readline().decode().strip()
     ser.close()
+    return error
 
     # (debugging) printing data:
     # b"['G1 L217.503103 R1282.552845\\n']" >> before removing newline in parse_gcode
@@ -48,4 +71,5 @@ def send_to_arduino(gcode_command):
     # b'G1 L217.503103 R1282.552845\n' >> CORRECT
 
 # initiate script with parse_args
-parse_args();
+if __name__ == '__main__':
+    parse_args();

@@ -1,3 +1,6 @@
+#include <AccelStepper.h>
+#include <MultiStepper.h>
+
 #include <Stepper.h>
 
 /*
@@ -63,18 +66,19 @@ int pen_up(){
 }
 
 // These have been measured as a viable homing position
-#define START_L 600
-#define START_R 600
+#define START_L STEPS(-600)
+#define START_R STEPS(600)
 double lastL = START_L; 
 double lastR = START_R;
 // Move to absolute position
 int move_motors(double l, double r){
-	double position[2] = {l, r};
+	long position[2] = {(long)(STEPS(-l)), (long)(STEPS(r))};
 	plotter.moveTo(position);
-	lastL = l; // not sure if we actually need these
-	lastR = r;
-	while(plotter.run())
-		; // run until done
+  digitalWrite(ENABLE_PIN_L, HIGH);
+  digitalWrite(ENABLE_PIN_R, HIGH);
+  plotter.runSpeedToPosition();
+  digitalWrite(ENABLE_PIN_L, LOW);
+  digitalWrite(ENABLE_PIN_R, LOW);
 
 	return 0;
 }
@@ -139,7 +143,7 @@ int exec_command(String cmd){
 					char point[10];
 					memset(point, 0, sizeof(point));
 					i = 0;
-					Serial.println(point);
+					//Serial.println(point);
 					while(cmd[strPos] != ' ' && cmd[strPos] != '\n'){
 						point[i] = cmd[strPos];
 						strPos++;
@@ -197,11 +201,17 @@ void setup_motors(){
 	digitalWrite(RESET_PIN_L, HIGH);
 	digitalWrite(RESET_PIN_R, HIGH);
 
-	digitalWrite(CONTROL_PIN_L, LOW);
-	digitalWrite(CONTROL_PIN_R, LOW);
+	digitalWrite(CONTROL_PIN_L, HIGH);
+	digitalWrite(CONTROL_PIN_R, HIGH);
 
-	motorL.setSpeed(200); // may need to change this param
-	motorR.setSpeed(200); // may need to change this param
+  motorL.setMaxSpeed(200);
+  motorR.setMaxSpeed(200);
+  motorL.setCurrentPosition(START_L);
+  motorR.setCurrentPosition(START_R);
+  motorL.setAcceleration(1000);
+  motorR.setAcceleration(1000);
+  //motorL.setEnablePin(ENABLE_PIN_L);
+  //motorR.setEnablePin(ENABLE_PIN_R);
 	plotter.addStepper(motorL);
 	plotter.addStepper(motorR);
 }
@@ -210,18 +220,18 @@ void setup_motors(){
  * Set up motors and pins, then send OK when read
  */
 void setup(){
-	Serial.begin(115200); // Start serial communication at 9600 baud
+	Serial.begin(9600); // Start serial communication at 9600 baud
 	Serial.println("Loading TagGang firmware!");
 
 	setup_motors();
 
-	Serial.println("OK");
+	//Serial.println("OK");
 }
 
 void loop(){
 	if (Serial.available()){
 		String cmd = Serial.readStringUntil('\n'); // quirk: the string has to have a space before \n for some reason?
-		Serial.print(cmd); // for debug
+		//Serial.print(cmd); // for debug
 	
 
 	int err = exec_command(cmd);

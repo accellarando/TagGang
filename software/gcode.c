@@ -2,10 +2,10 @@
  * This file contains code to generate G-Code from a list of points.
  *
  * TODO:
+ *		- On second and subsequent runs, this does NOT work! It thinks the starting Y point is some big number. Not sure why. 
  *		- Testing
  *		- May be a good idea to check that each point is within bounds.
  *			(they should be, but just in case...)
- *		- Loading bar? (stretch goal)
  *
  * @author Ella Moss
  */
@@ -76,8 +76,10 @@ void scale_paths(GList* points) {
 		while(this_path != NULL){
 			DoublePoint* point = (DoublePoint*) this_path->data;
 			point->x *= x_factor;
+			point->x /= (WINDOW_WIDTH/GRID_SIZE);
 			point->x += start_x;
 			point->y *= y_factor;
+			point->y /= (WINDOW_HEIGHT/GRID_SIZE);
 			point->y += start_y;
 			this_path = this_path->next;
 		}

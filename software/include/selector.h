@@ -8,7 +8,7 @@
 
 
 /* Global variables */
-#define GRID_SIZE 50
+#define GRID_SIZE 100
 #define SNAP_INTERVAL 0.5
 #define WINDOW_WIDTH 800 // Increased window width to accommodate the image display area
 #define WINDOW_HEIGHT 500

@@ -71,6 +71,10 @@ static void parse_gcode(){
 static void finish_sending_stage() {
 	gtk_widget_hide(label);
 	
+	// Clear out points_list
+	g_list_free(points_list);
+	points_list = NULL;
+
 	// change window title to loop back to beginning
 	gtk_window_set_title(GTK_WINDOW(window), TITLE_CANVAS);
 }
