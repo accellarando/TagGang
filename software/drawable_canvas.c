@@ -7,8 +7,14 @@
  * Code sample starting point from https://docs.gtk.org/gtk3/getting_started.html#custom-drawing
  *
  * todo:
- *	  - Controls graphic - A to 
- *	  - Make BUTTON_ERASE work to undo last path, rather than erase entire image
+ *	  - Controls graphic at the bottom of the screen:
+ *		  * A for pen down
+ *		  * B to erase
+ *		  * Y to confirm
+ *	  - Make BUTTON_ERASE (B) work to undo last path, rather than erase entire image
+ *			(low priority)
+ *	  - also a low priority - video screen below drawing area so u can tell you're in the screen?
+ *
  * @author Ella Moss
  */
 #include <drawable_canvas.h>

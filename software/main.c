@@ -12,6 +12,7 @@
  * TODO in main:
  *	- right now we're polling joystick values rather than having a listener
  *		(but that's a low priority - this way works)
+ *		https://retropie.org.uk/docs/Nintendo-Switch-Controllers/	
  */
 #include <main.h>
 #include <fcntl.h>
@@ -312,6 +313,11 @@ volatile int joy_y = 0;
 volatile int btn_available = 0;
 volatile struct js_event event;
 
+/***
+ * This executes every 100ms or whatebver
+ *
+ * @param data: joystick file descriptor
+ */
 gboolean check_for_js_events(gpointer data){
 	int joystick_fd = *((int*)data);
 	if(read_event(joystick_fd, &event) == 0){
@@ -369,8 +375,9 @@ int main (int    argc,
 			NULL);
 	// Setup joystick
 	//setup_joysticks(); // This doesn't work for some reason, poll instead:
-	int joystick_fd = open("/dev/input/js0", O_RDONLY | O_NONBLOCK);
-	g_timeout_add(JOY_POLL_PERIOD, check_for_js_events, &joystick_fd);
+	
+	int joystick_fd = open("/dev/input/js0", O_RDONLY | O_NONBLOCK); // Open joystick as file descriptor
+	g_timeout_add(JOY_POLL_PERIOD, check_for_js_events, &joystick_fd); // Register joystick processing callback to run every JOY_POLL_PERIOD ms
 
 	// Set up activation signal handler
 	g_signal_connect (app, "activate", G_CALLBACK (activate), window);

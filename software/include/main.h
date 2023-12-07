@@ -25,7 +25,7 @@
 #define JOY_RIGHT_X 0
 #define JOY_RIGHT_Y 1
 
-#define DEADZONE 4000
+#define DEADZONE 8000
 
 #define JOY_SPEED 4.0 
 

@@ -3,12 +3,7 @@
  * tag will be drawn.
  *
  * TODO:
- *     - Support state, ie render previous images in their locations (save entire thing to png maybe?)
- *     - Buttons - integrate with Switch controller, or even Skeltrack as a stretch goal
- *     - Finish this stage and move to next stage: (see drawable_canvas for examples)
- *         - Save image coordinates by prepending them to points_list
- *         - Clean up widgets
- *         - Change title
+ *		- Joycon drift calibration
  *
  * @author Dana Escandor
  */

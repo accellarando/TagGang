@@ -2,7 +2,6 @@
  * This file contains code to generate G-Code from a list of points.
  *
  * TODO:
- *		- On second and subsequent runs, this does NOT work! It thinks the starting Y point is some big number. Not sure why. 
  *		- Testing
  *		- May be a good idea to check that each point is within bounds.
  *			(they should be, but just in case...)

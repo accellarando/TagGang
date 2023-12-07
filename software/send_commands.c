@@ -6,6 +6,7 @@
  * Once EOF is reached, change title back to the TITLE_CANVAS.
  * 
  * TODO:
+ *      - Hangs on "Loading TagGang Firmware" from arduino
  * 		- loading bar that lets you keep track of progress
  * 		- fix summary
  * 
