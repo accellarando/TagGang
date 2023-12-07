@@ -7,8 +7,8 @@
  * Code sample starting point from https://docs.gtk.org/gtk3/getting_started.html#custom-drawing
  *
  * todo:
- * Make BUTTON_ERASE work to undo last path
- *
+ *	  - Controls graphic - A to 
+ *	  - Make BUTTON_ERASE work to undo last path, rather than erase entire image
  * @author Ella Moss
  */
 #include <drawable_canvas.h>

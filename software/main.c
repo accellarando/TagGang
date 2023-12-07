@@ -8,6 +8,10 @@
  *
  * Kinect code in this program is based on the Skeltrack example.
  * https://github.com/joaquimrocha/Skeltrack/blob/master/examples/test-kinect.c
+ *
+ * TODO in main:
+ *	- right now we're polling joystick values rather than having a listener
+ *		(but that's a low priority - this way works)
  */
 #include <main.h>
 #include <fcntl.h>
@@ -28,7 +32,6 @@ SkeltrackSkeleton *skeleton = NULL;
 gfloat smoothing_factor = 0.0;
 
 void on_destroy(GtkWidget *widget, gpointer data){
-	printf("On destroy running\n");
 	g_application_quit((GtkApplication*)data);
 }
 
