@@ -142,8 +142,10 @@ static void send_coordinates() {
     g_print("Box Coordinates: (%.0f, %.0f)\n", box_x, box_y);
 }
 
+
 static GList* point_path = NULL;
 static void save_coordinates(double x, double y) {
+	g_list_free_full(g_steal_pointer(&point_path), free);
 	g_print("Box Coordinates: (%.0f, %.0f)\n", x, y);
 
 	DoublePoint* p = malloc(sizeof(DoublePoint));
