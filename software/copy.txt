@@ -1,67 +1,19 @@
-/* Callback function for the "draw" signal */
-static gdouble last_joy_time = 0;
-static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
-    GError *error = NULL;
+void setup_selector() {
+    // Create a horizontal box
+    GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 
-    // Check if the file exists
-    if (!g_file_test("selector.png", G_FILE_TEST_EXISTS)) {
-        // Create a new file if it doesn't exist
-        cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, WINDOW_WIDTH, WINDOW_HEIGHT);
-        cairo_t *temp_cr = cairo_create(surface);
-        cairo_set_source_rgba(temp_cr, 0.0, 0.0, 0.0, 0.0); // Transparent
-        cairo_paint(temp_cr);
-        cairo_surface_write_to_png(surface, "selector.png");
-        cairo_destroy(temp_cr);
-        cairo_surface_destroy(surface);
-    }
+    // Create drawing area
+    selector_area = gtk_drawing_area_new();
+    gtk_widget_set_size_request(selector_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+    gtk_box_pack_start(GTK_BOX(hbox), selector_area, TRUE, TRUE, 0);
 
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("selector.png", &error);
-    if (error == NULL) {
-        // Paint the image onto the drawing area
-        gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
-        cairo_paint(cr);
+    // Create image display area
+    image_display_area = gtk_image_new();
+    gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+    gtk_box_pack_start(GTK_BOX(hbox), image_display_area, TRUE, TRUE, 0);
 
-        // Release resources
-        g_object_unref(pixbuf);
-    } else {
-        // Handle loading error
-        printf("Error loading image: %s\n", error->message);
-        g_error_free(error);
-    }
-
-    if (last_joy_time == 0 || (unsigned int)(g_get_monotonic_time() - last_joy_time) > 1000000 / JOY_SPEED) {
-        printf("joy x, y: %d %d\n", joy_x, joy_y);
-        move_box(joy_x * SNAP_INTERVAL, joy_y * SNAP_INTERVAL);
-        last_joy_time = g_get_monotonic_time();
-    }
-
-    // Check if we need to finish selector stage
-    if (btn_available == 1 && event.type == JS_EVENT_BUTTON && event.number == BTN_RIGHT_Y && event.value == 1) {
-        // Finish up
-        btn_available = 0;
-        if (last_joy_time != 0) {
-            if (display_image) {
-                save_coordinates(box_x, box_y);
-                finish_selector_stage();
-            }
-            image_x = box_x;
-            image_y = box_y;
-
-            display_image = !display_image; // Toggle the display_image flag
-
-            gtk_widget_queue_draw(selector_area);
-
-            return FALSE;
-        }
-    }
-
-    // Draw selector box
-    draw_selector(cr, box_x, box_y); // draw selector box
-
-    // Draw loaded images only if the display_image flag is true
-    if (display_image) {
-        draw_images(cr);
-    }
-
-    return FALSE; // Indicate draw operation is complete
+    // Hide it - show later.
+    gtk_widget_hide(selector_area);
+    gtk_widget_hide(image_display_area);
 }
