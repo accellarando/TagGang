@@ -67,11 +67,11 @@ static void move_box(double dx, double dy) {
     if (box_y < 0)
         box_y = 0;
 
-    if (box_x + GRID_SIZE > CANVAS_WIDTH)
-        box_x = CANVAS_WIDTH - GRID_SIZE;
+    if (box_x + GRID_SIZE > WINDOW_WIDTH)
+        box_x = WINDOW_WIDTH - GRID_SIZE;
 
-    if (box_y + GRID_SIZE > CANVAS_HEIGHT)
-        box_y = CANVAS_HEIGHT - GRID_SIZE;
+    if (box_y + GRID_SIZE > WINDOW_HEIGHT)
+        box_y = WINDOW_HEIGHT - GRID_SIZE;
 
     gtk_widget_queue_draw(selector_area); // Redraw the drawing area
 
@@ -159,7 +159,7 @@ static void finish_selector_stage() {
 	g_signal_handlers_disconnect_by_func(vbox, G_CALLBACK(on_draw), NULL);
 
 	// Save selector_area as a png
-	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, CANVAS_WIDTH, CANVAS_HEIGHT);
+	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, WINDOW_WIDTH, WINDOW_HEIGHT);
 	cairo_t *cr = cairo_create(surface);
 	gdk_cairo_set_source_window(cr, gtk_widget_get_window(selector_area), 0, 0);
 	cairo_paint(cr);
@@ -249,12 +249,12 @@ static void load_and_set_image() {
 void setup_selector(){
     // Create drawing area
     selector_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(selector_area, CANVAS_WIDTH / 2, CANVAS_HEIGHT);
+    gtk_widget_set_size_request(selector_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
     gtk_box_pack_start(GTK_BOX(vbox), selector_area, TRUE, TRUE, 0);
 
     // Create image display area
     image_display_area = gtk_image_new();
-    gtk_widget_set_size_request(image_display_area, CANVAS_WIDTH / 2, CANVAS_HEIGHT);
+    gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
     gtk_box_pack_start(GTK_BOX(vbox), image_display_area, TRUE, TRUE, 0);
 
 	// Hide it - show later.
