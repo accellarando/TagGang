@@ -1,19 +1,12 @@
-void setup_selector() {
-    // Create a horizontal box
-    GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+static void setup_image_window() {
+    if (image_window == NULL) {
+        image_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+        gtk_window_set_title(GTK_WINDOW(image_window), "Image Display");
+        gtk_window_set_default_size(GTK_WINDOW(image_window), GRID_SIZE, GRID_SIZE);
+        g_signal_connect(G_OBJECT(image_window), "destroy", G_CALLBACK(gtk_widget_destroy), NULL);
 
-    // Create drawing area
-    selector_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(selector_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
-    gtk_box_pack_start(GTK_BOX(hbox), selector_area, TRUE, TRUE, 0);
-
-    // Create image display area
-    image_display_area = gtk_image_new();
-    gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
-    gtk_box_pack_start(GTK_BOX(hbox), image_display_area, TRUE, TRUE, 0);
-
-    // Hide it - show later.
-    gtk_widget_hide(selector_area);
-    gtk_widget_hide(image_display_area);
+        GtkWidget *image_display = gtk_image_new();
+        gtk_container_add(GTK_CONTAINER(image_window), image_display);
+        gtk_widget_show_all(image_window);
+    }
 }
