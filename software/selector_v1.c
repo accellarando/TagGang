@@ -84,7 +84,11 @@ static void move_box(double dx, double dy) {
 /* Callback function for the "draw" signal */
 static gdouble last_joy_time = 0;
 static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
-	GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("selector.png", NULL);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("selector.png", NULL);
+    if (pixbuf = NULL) {
+	
+    }
+    
     if (pixbuf != NULL) {
         // Paint the image onto the drawing area
         gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
@@ -94,7 +98,7 @@ static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
         g_object_unref(pixbuf);
     } else {
         // Handle loading error
-        printf("Error loading image.\n");
+        printf("Error loading SELECTOR image.\n");
     }
 
 	if(last_joy_time == 0 || (unsigned int)(g_get_monotonic_time() - last_joy_time) > 1000000/JOY_SPEED){
@@ -216,6 +220,17 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
 
 static void load_and_set_image() {
     if (image_file_path != NULL) {
+	if (!g_file_test(image_file_path, G_FILE_TEST_EXISTS)){
+	    FILE *file = fopen(image_file_path, "w");
+	    printf("MAKING NEW DRAWING");
+	    if (file != NULL) {
+		fclose(file);
+	    }
+	    else {
+		g_printerr("Error creating file %s\n", image_file_path);
+	    }
+	}
+	
         if (image_pixbuf != NULL) {
             g_object_unref(image_pixbuf);
             image_pixbuf = NULL;
