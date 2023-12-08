@@ -67,11 +67,11 @@ static void move_box(double dx, double dy) {
     if (box_y < 0)
         box_y = 0;
 
-    if (box_x + GRID_SIZE > WINDOW_WIDTH)
-        box_x = WINDOW_WIDTH - GRID_SIZE;
+    if (box_x + GRID_SIZE > CANVAS_WIDTH)
+        box_x = CANVAS_WIDTH - GRID_SIZE;
 
-    if (box_y + GRID_SIZE > WINDOW_HEIGHT)
-        box_y = WINDOW_HEIGHT - GRID_SIZE;
+    if (box_y + GRID_SIZE > CANVAS_HEIGHT)
+        box_y = CANVAS_HEIGHT - GRID_SIZE;
 
     gtk_widget_queue_draw(selector_area); // Redraw the drawing area
 
@@ -84,23 +84,8 @@ static void move_box(double dx, double dy) {
 /* Callback function for the "draw" signal */
 static gdouble last_joy_time = 0;
 static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
-    GError *error = NULL;
-
-    // Check if the file exists
-    if (!g_file_test("selector.png", G_FILE_TEST_EXISTS)) {
-	printf("SELECTOR DOESN'T EXISITS, WRITING IT!");
-        // Create a new file if it doesn't exist
-        cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, WINDOW_WIDTH, WINDOW_HEIGHT);
-        cairo_t *temp_cr = cairo_create(surface);
-        cairo_set_source_rgba(temp_cr, 0.0, 0.0, 0.0, 0.0); // Transparent
-        cairo_paint(temp_cr);
-        cairo_surface_write_to_png(surface, "selector.png");
-        cairo_destroy(temp_cr);
-        cairo_surface_destroy(surface);
-    }
-
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("selector.png", &error);
-    if (error == NULL) {
+	GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("selector.png", NULL);
+    if (pixbuf != NULL) {
         // Paint the image onto the drawing area
         gdk_cairo_set_source_pixbuf(cr, pixbuf, 0, 0);
         cairo_paint(cr);
@@ -109,37 +94,35 @@ static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
         g_object_unref(pixbuf);
     } else {
         // Handle loading error
-        printf("Error loading image: %s\n", error->message);
-        g_error_free(error);
+        printf("Error loading image.\n");
     }
 
-    if (last_joy_time == 0 || (unsigned int)(g_get_monotonic_time() - last_joy_time) > 1000000 / JOY_SPEED) {
-        printf("joy x, y: %d %d\n", joy_x, joy_y);
-        move_box(joy_x * SNAP_INTERVAL, joy_y * SNAP_INTERVAL);
-        last_joy_time = g_get_monotonic_time();
-    }
-
-    // Check if we need to finish selector stage
-    if (btn_available == 1 && event.type == JS_EVENT_BUTTON && event.number == BTN_RIGHT_Y && event.value == 1) {
-        // Finish up
-        btn_available = 0;
-        if (last_joy_time != 0) {
-            if (display_image) {
-                save_coordinates(box_x, box_y);
-                finish_selector_stage();
-            }
-            image_x = box_x;
+	if(last_joy_time == 0 || (unsigned int)(g_get_monotonic_time() - last_joy_time) > 1000000/JOY_SPEED){
+		printf("joy x, y: %d %d\n", joy_x, joy_y);
+		move_box(joy_x*SNAP_INTERVAL, joy_y*SNAP_INTERVAL);
+		last_joy_time = g_get_monotonic_time();
+	}
+	// Check if we need to finish selector stage
+	if(btn_available == 1 && event.type == JS_EVENT_BUTTON && event.number == BTN_RIGHT_Y && event.value == 1){
+		// Finish up
+		btn_available = 0;
+		if(last_joy_time != 0){
+			if(display_image){
+				save_coordinates(box_x, box_y);
+				finish_selector_stage();
+				return;
+			}
+			image_x = box_x;
             image_y = box_y;
 
-            display_image = !display_image; // Toggle the display_image flag
+            display_image = !display_image;  // Toggle the display_image flag
 
             gtk_widget_queue_draw(selector_area);
 
-            return FALSE;
-        }
-    }
-
-    // Draw selector box
+			return FALSE;
+		}
+	}
+	// Draw selector box
     draw_selector(cr, box_x, box_y); // draw selector box
 
     // Draw loaded images only if the display_image flag is true
@@ -148,6 +131,11 @@ static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
     }
 
     return FALSE; // Indicate draw operation is complete
+}
+
+/* !!! fix to send out to gcode CAM instead of printing */
+static void send_coordinates() {
+    g_print("Box Coordinates: (%.0f, %.0f)\n", box_x, box_y);
 }
 
 
@@ -166,13 +154,12 @@ static void save_coordinates(double x, double y) {
 }
 
 static void finish_selector_stage() {
-	printf("FINISH SELECTOR STAGE");
 	// Disconnect signal handler for keypress
 	g_signal_handlers_disconnect_by_func(window, G_CALLBACK(on_key_press), NULL);
 	g_signal_handlers_disconnect_by_func(vbox, G_CALLBACK(on_draw), NULL);
 
 	// Save selector_area as a png
-	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, WINDOW_WIDTH, WINDOW_HEIGHT);
+	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, CANVAS_WIDTH, CANVAS_HEIGHT);
 	cairo_t *cr = cairo_create(surface);
 	gdk_cairo_set_source_window(cr, gtk_widget_get_window(selector_area), 0, 0);
 	cairo_paint(cr);
@@ -230,17 +217,6 @@ static void on_key_press(GtkWidget *widget, GdkEventKey *event, gpointer user_da
 
 static void load_and_set_image() {
     if (image_file_path != NULL) {
-	if (!g_file_test(image_file_path, G_FILE_TEST_EXISTS)){
-	    FILE *file = fopen(image_file_path, "w");
-	    printf("MAKING NEW DRAWING");
-	    if (file != NULL) {
-		fclose(file);
-	    }
-	    else {
-		g_printerr("Error creating file %s\n", image_file_path);
-	    }
-	}
-	
         if (image_pixbuf != NULL) {
             g_object_unref(image_pixbuf);
             image_pixbuf = NULL;
@@ -273,12 +249,12 @@ static void load_and_set_image() {
 void setup_selector(){
     // Create drawing area
     selector_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(selector_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+    gtk_widget_set_size_request(selector_area, CANVAS_WIDTH / 2, CANVAS_HEIGHT);
     gtk_box_pack_start(GTK_BOX(vbox), selector_area, TRUE, TRUE, 0);
 
     // Create image display area
     image_display_area = gtk_image_new();
-    gtk_widget_set_size_request(image_display_area, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+    gtk_widget_set_size_request(image_display_area, CANVAS_WIDTH / 2, CANVAS_HEIGHT);
     gtk_box_pack_start(GTK_BOX(vbox), image_display_area, TRUE, TRUE, 0);
 
 	// Hide it - show later.
