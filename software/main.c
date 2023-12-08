@@ -318,47 +318,42 @@ volatile struct js_event event;
  *
  * @param data: joystick file descriptor
  */
-gboolean check_for_js_events(gpointer data){
-	int joystick_fd = *((int*)data);
-	if(read_event(joystick_fd, &event) == 0){
-		g_print("Joystick event! type: %d, number: %d, value: %d\n", event.type, event.number, event.value);
-		if(event.type == JS_EVENT_BUTTON){
-			btn_available = 1;
-		}
-		else if(event.type == JS_EVENT_AXIS){
-			joy_available = 1;
-			// convert this to a keypress
-			if(event.number == JOY_RIGHT_X){
-				if(event.value > DEADZONE){
-					joy_x = 1;
-				}
-				else if(event.value < -DEADZONE){
-					joy_x = -1;
-				}
-				else{
-					joy_x = 0;
-				}
-			}
-			if(event.number == JOY_RIGHT_Y){
-				if(event.value > DEADZONE){
-					joy_y = 1; //down
-				}
-				else if(event.value < -DEADZONE){
-					joy_y = -1;
-				}
-				else{
-					joy_y = 0;
-				}
-			}
+gboolean on_js_io_ready(GIOChannel *source, GIOCondition condition, gpointer data) {
+    int joystick_fd = *((int *) data);
+    if (read_event(joystick_fd, &event) == 0) {
+        g_print("Joystick event! type: %d, number: %d, value: %d\n", event.type, event.number, event.value);
+        if (event.type == JS_EVENT_BUTTON) {
+            btn_available = 1;
+        } else if (event.type == JS_EVENT_AXIS) {
+            joy_available = 1;
+            // convert this to a keypress
+            if (event.number == JOY_RIGHT_X) {
+                if (event.value > DEADZONE) {
+                    joy_x = 1;
+                } else if (event.value < -DEADZONE) {
+                    joy_x = -1;
+                } else {
+                    joy_x = 0;
+                }
+            }
+            if (event.number == JOY_RIGHT_Y) {
+                if (event.value > DEADZONE) {
+                    joy_y = 1; //down
+                } else if (event.value < -DEADZONE) {
+                    joy_y = -1;
+                } else {
+                    joy_y = 0;
+                }
+            }
+        }
+        if (selector_area != NULL) {
+            gtk_widget_queue_draw(selector_area);
+        }
+    }
 
-		}
-		if(selector_area != NULL){
-			gtk_widget_queue_draw(selector_area);
-		}
-	}
-
-	return G_SOURCE_CONTINUE;
+    return G_SOURCE_CONTINUE;
 }
+
 
 int main (int    argc,
 		char **argv)
