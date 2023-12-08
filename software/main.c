@@ -377,14 +377,17 @@ int main (int    argc,
 	//setup_joysticks(); // This doesn't work for some reason, poll instead:
 	
 	int joystick_fd = open("/dev/input/js0", O_RDONLY | O_NONBLOCK); // Open joystick as file descriptor
-	g_timeout_add(JOY_POLL_PERIOD, check_for_js_events, &joystick_fd); // Register joystick processing callback to run every JOY_POLL_PERIOD ms
+	//g_timeout_add(JOY_POLL_PERIOD, check_for_js_events, &joystick_fd); // Register joystick processing callback to run every JOY_POLL_PERIOD ms
+	GIOChannel *js_io_channel = g_io_channel_unix_new(joystick_fd);
+	g_io_add_watch(js_io_channel, G_IO_IN, on_js_io_ready, &joystick_fd);
+	g_io_channel_unref(js_io_channel);
 
 	// Set up activation signal handler
 	g_signal_connect (app, "activate", G_CALLBACK (activate), window);
 	status = g_application_run (G_APPLICATION (app), argc, argv);
 
 	g_object_unref (app);
-	close(joystick_fd);
+	//close(joystick_fd);
 
 	return status;
 }
