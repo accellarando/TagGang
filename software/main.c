@@ -318,47 +318,42 @@ volatile struct js_event event;
  *
  * @param data: joystick file descriptor
  */
-gboolean check_for_js_events(gpointer data){
-	int joystick_fd = *((int*)data);
-	if(read_event(joystick_fd, &event) == 0){
-		g_print("Joystick event! type: %d, number: %d, value: %d\n", event.type, event.number, event.value);
-		if(event.type == JS_EVENT_BUTTON){
-			btn_available = 1;
-		}
-		else if(event.type == JS_EVENT_AXIS){
-			joy_available = 1;
-			// convert this to a keypress
-			if(event.number == JOY_RIGHT_X){
-				if(event.value > DEADZONE){
-					joy_x = 1;
-				}
-				else if(event.value < -DEADZONE){
-					joy_x = -1;
-				}
-				else{
-					joy_x = 0;
-				}
-			}
-			if(event.number == JOY_RIGHT_Y){
-				if(event.value > DEADZONE){
-					joy_y = 1; //down
-				}
-				else if(event.value < -DEADZONE){
-					joy_y = -1;
-				}
-				else{
-					joy_y = 0;
-				}
-			}
+gboolean on_js_io_ready(GIOChannel *source, GIOCondition condition, gpointer data) {
+    int joystick_fd = *((int *) data);
+    if (read_event(joystick_fd, &event) == 0) {
+        g_print("Joystick event! type: %d, number: %d, value: %d\n", event.type, event.number, event.value);
+        if (event.type == JS_EVENT_BUTTON) {
+            btn_available = 1;
+        } else if (event.type == JS_EVENT_AXIS) {
+            joy_available = 1;
+            // convert this to a keypress
+            if (event.number == JOY_RIGHT_X) {
+                if (event.value > DEADZONE) {
+                    joy_x = 1;
+                } else if (event.value < -DEADZONE) {
+                    joy_x = -1;
+                } else {
+                    joy_x = 0;
+                }
+            }
+            if (event.number == JOY_RIGHT_Y) {
+                if (event.value > DEADZONE) {
+                    joy_y = 1; //down
+                } else if (event.value < -DEADZONE) {
+                    joy_y = -1;
+                } else {
+                    joy_y = 0;
+                }
+            }
+        }
+        if (selector_area != NULL) {
+            gtk_widget_queue_draw(selector_area);
+        }
+    }
 
-		}
-		if(selector_area != NULL){
-			gtk_widget_queue_draw(selector_area);
-		}
-	}
-
-	return G_SOURCE_CONTINUE;
+    return G_SOURCE_CONTINUE;
 }
+
 
 int main (int    argc,
 		char **argv)
@@ -377,14 +372,19 @@ int main (int    argc,
 	//setup_joysticks(); // This doesn't work for some reason, poll instead:
 	
 	int joystick_fd = open("/dev/input/js0", O_RDONLY | O_NONBLOCK); // Open joystick as file descriptor
-	g_timeout_add(JOY_POLL_PERIOD, check_for_js_events, &joystick_fd); // Register joystick processing callback to run every JOY_POLL_PERIOD ms
+	//g_timeout_add(JOY_POLL_PERIOD, check_for_js_events, &joystick_fd); // Register joystick processing callback to run every JOY_POLL_PERIOD ms
+	
+	// GIOChannel to monitor (I/O watch) the joystick file descriptor for readiness, when it becomes readable the callback function will be incoked to handle joycon events
+	GIOChannel *js_io_channel = g_io_channel_unix_new(joystick_fd);
+	g_io_add_watch(js_io_channel, G_IO_IN, on_js_io_ready, &joystick_fd);
+	g_io_channel_unref(js_io_channel);
 
 	// Set up activation signal handler
 	g_signal_connect (app, "activate", G_CALLBACK (activate), window);
 	status = g_application_run (G_APPLICATION (app), argc, argv);
 
 	g_object_unref (app);
-	close(joystick_fd);
+	//close(joystick_fd);
 
 	return status;
 }
