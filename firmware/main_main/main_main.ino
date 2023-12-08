@@ -50,7 +50,7 @@ MultiStepper plotter;
  */
 int pen_down(){
 	penServo.attach(PIN_PEN_SERVO);
-	for(int i=0; i<180; i++){
+	for(int i=0; i<90; i++){
 		penServo.write(i);
 		delay(15); // i guess?
 	}
@@ -58,7 +58,7 @@ int pen_down(){
 }
 int pen_up(){
 	penServo.attach(PIN_PEN_SERVO);
-	for(int i=180; i>0; i--){
+	for(int i=90; i>0; i--){
 		penServo.write(i);
 		delay(15); 
 	}
@@ -66,8 +66,8 @@ int pen_up(){
 }
 
 // These have been measured as a viable homing position
-#define START_L STEPS(-900)
-#define START_R STEPS(900)
+#define START_L STEPS(-500)
+#define START_R STEPS(500)
 double lastL = START_L; 
 double lastR = START_R;
 // Move to absolute position
@@ -187,22 +187,19 @@ void setup_motors(){
 	pinMode(STEP_PIN_R, OUTPUT);
 	pinMode(ENABLE_PIN_L, OUTPUT);
 	pinMode(ENABLE_PIN_R, OUTPUT);
-	pinMode(CONTROL_PIN_L, OUTPUT);
-	pinMode(CONTROL_PIN_R, OUTPUT);
-	pinMode(RESET_PIN_L, OUTPUT);
-	pinMode(RESET_PIN_R, OUTPUT);
-
+  pinMode(PIN_PEN_SERVO, OUTPUT);
+	pinMode(CTR_PIN, OUTPUT);
+	pinMode(RST_PIN, OUTPUT);
+	pinMode(REFA_PIN, OUTPUT);
+  pinMode(REFB_PIN, OUTPUT);
+  
 	// Initialize stepper motors
-	analogWrite(VREFA_PIN_L, 50);
-	analogWrite(VREFB_PIN_L, 50);
-	analogWrite(VREFA_PIN_R, 50);
-	analogWrite(VREFB_PIN_R, 50);
+	analogWrite(REFA_PIN, 50);
+	analogWrite(REFB_PIN, 50);
 
-	digitalWrite(RESET_PIN_L, HIGH);
-	digitalWrite(RESET_PIN_R, HIGH);
+	digitalWrite(RST_PIN, HIGH);
 
-	digitalWrite(CONTROL_PIN_L, HIGH);
-	digitalWrite(CONTROL_PIN_R, HIGH);
+	digitalWrite(CTR_PIN, HIGH);
 
   motorL.setMaxSpeed(200);
   motorR.setMaxSpeed(200);
@@ -210,8 +207,6 @@ void setup_motors(){
   motorR.setCurrentPosition(START_R);
   motorL.setAcceleration(1000);
   motorR.setAcceleration(1000);
-  //motorL.setEnablePin(ENABLE_PIN_L);
-  //motorR.setEnablePin(ENABLE_PIN_R);
 	plotter.addStepper(motorL);
 	plotter.addStepper(motorR);
 }
@@ -231,7 +226,7 @@ void setup(){
 void loop(){
 	if (Serial.available()){
 		String cmd = Serial.readStringUntil('\n'); // quirk: the string has to have a space before \n for some reason?
-		//Serial.print(cmd); // for debug
+		Serial.print(cmd); // for debug
 	
 
 	int err = exec_command(cmd);

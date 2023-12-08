@@ -1,7 +1,7 @@
 // Pins
 #define STEP_PIN_L		PB2 // PD5 net on board
-#define DIR_PIN_L		  PB4 // PB0 net on board
-#define ENABLE_PIN_L	PD5 // PD7 net on board
+#define DIR_PIN_L		PB4 // PB0 net on board
+#define ENABLE_PIN_L	PB5 // PD7 net on board
 
 // These pins are on the NUCLEO driver
 #define STEP_PIN_R		PD6
