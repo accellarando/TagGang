@@ -8,13 +8,12 @@
 #include <math.h>
 
 // Canvas setup, all in mm
-#define CUTOFF_TOP 270
-#define CUTOFF_BOTTOM 1600
-// I made up these last two lmao, may take some trial and error
-#define CUTOFF_LEFT 100
-#define CUTOFF_RIGHT 100
+#define CUTOFF_TOP 371
+#define CUTOFF_BOTTOM 1081
+#define CUTOFF_LEFT 60
+#define CUTOFF_RIGHT 60
 
-#define MOTOR_DISTANCE 840
+#define MOTOR_DISTANCE 610
 
 #define CANVAS_WIDTH (MOTOR_DISTANCE - CUTOFF_LEFT - CUTOFF_RIGHT)
 #define CANVAS_HEIGHT (CUTOFF_BOTTOM - CUTOFF_TOP)

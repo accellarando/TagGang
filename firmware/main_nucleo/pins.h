@@ -1,22 +1,28 @@
 // Pins
-#define STEP_PIN_L		PB2 // PD5 net on board
-#define DIR_PIN_L		  PB4 // PB0 net on board
-#define ENABLE_PIN_L	PD5 // PD7 net on board
+#define STEP_PIN_L    6
+#define DIR_PIN_L   7
+#define ENABLE_PIN_L  2
+#define CONTROL_PIN_L 5
+#define RESET_PIN_L   12
 
-// These pins are on the NUCLEO driver
-#define STEP_PIN_R		PD6
-#define DIR_PIN_R		  PD7
-#define ENABLE_PIN_R	PD2
-#define CTR_PIN       PD5
-#define RST_PIN       PB0
-#define REFA_PIN      PD3
-#define REFB_PIN      PB1
+#define STEP_PIN_R    A0
+#define DIR_PIN_R   4
+#define ENABLE_PIN_R  8
+#define CONTROL_PIN_R A1
+#define RESET_PIN_R   13
+
+#define VREFA_PIN_L   3
+#define VREFB_PIN_L   9
+#define VREFA_PIN_R     10
+#define VREFB_PIN_R   11
 
 #define PIN_PEN_SERVO A2
 
 // Stepper motor constants
 #define GEAR_RADIUS 4.0 //mm
-#define DEGREES_PER_STEP 1.8
-#define PULSES_PER_STEP 1.0
-#define STEPS_PER_MM ((180.0*PULSES_PER_STEP) / (PI * GEAR_RADIUS * DEGREES_PER_STEP))
-#define STEPS(x) (x*STEPS_PER_MM)
+#define STEPS_PER_REV 200.0
+#define PULSES_PER_STEP_L 2.0
+#define PULSES_PER_STEP_R 2.0
+#define STEPS_PER_MM ( STEPS_PER_REV / (2 * PI * GEAR_RADIUS) )
+#define STEPS_R(x) (x*STEPS_PER_MM*PULSES_PER_STEP_R)
+#define STEPS_L(x) (x*STEPS_PER_MM*PULSES_PER_STEP_L)

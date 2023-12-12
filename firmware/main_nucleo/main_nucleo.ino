@@ -66,13 +66,13 @@ int pen_up(){
 }
 
 // These have been measured as a viable homing position
-#define START_L STEPS(-900)
-#define START_R STEPS(900)
+#define START_L STEPS_L(-480)
+#define START_R STEPS_R(480)
 double lastL = START_L; 
 double lastR = START_R;
 // Move to absolute position
 int move_motors(double l, double r){
-	long position[2] = {(long)(STEPS(-l)), (long)(STEPS(r))};
+	long position[2] = {(long)(STEPS_L(-l)), (long)(STEPS_R(r))};
 	plotter.moveTo(position);
   digitalWrite(ENABLE_PIN_L, HIGH);
   digitalWrite(ENABLE_PIN_R, HIGH);
@@ -204,12 +204,12 @@ void setup_motors(){
 	digitalWrite(CONTROL_PIN_L, HIGH);
 	digitalWrite(CONTROL_PIN_R, HIGH);
 
-  motorL.setMaxSpeed(200);
-  motorR.setMaxSpeed(200);
+  motorL.setMaxSpeed(100);
+  motorR.setMaxSpeed(100);
   motorL.setCurrentPosition(START_L);
   motorR.setCurrentPosition(START_R);
-  motorL.setAcceleration(1000);
-  motorR.setAcceleration(1000);
+  motorL.setAcceleration(200);
+  motorR.setAcceleration(200);
   //motorL.setEnablePin(ENABLE_PIN_L);
   //motorR.setEnablePin(ENABLE_PIN_R);
 	plotter.addStepper(motorL);
