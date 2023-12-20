@@ -17,28 +17,70 @@
 		<!-- Navbar to be populated here -->
 
 		<div class="container border rounded mt-4">
-			<h2>Plotter Frame and Mechanics</h2>
-			<p>Here we discuss the mechanical aspects of our plotter project, including the design and construction of the frame.</p>
-	
+			<h1>Vertial Paint Pen-Plotter</h1>
+			<p>The plotter for TagGang was comprised of custom-fitted 3D prints, a vertically-elongated rolling whiteboard, 2-phase 1.8 degree/step stepper motors, timing belt and pulley, ball bearings, alongside the various wires and power adapters.<br>
+			This cable-driven plotter mounts stepper motors to the top corners of the whiteboard. The timing belt is threaded through the mounts, interlocking with the timing pulleys on each stepper motor, and ending with a counterweight that holds pennies.
+			The other end of the belt is attached to an arm of the gondola. The gondola holds the paint pen and servo motor that lifts the gondola off the paper. Long wires connect the motors to the custom Pi Hat hardware to drive them.<br>
+			</p>
+
+			<h2>Demo Day Plotter</h2>
+			<p>TagGang's final version of the plotter utilized the CADE lab's vertically-elongated plotter, wrapped with 6' of white butcher paper.<br>
+			Connecting wires and power adapters not shown in the picture below, but were laid out on the table.<br> 
 			<!-- Image of the plotter frame -->
 			<div class="text-center">
-				<img src="path/to/plotter-frame.jpg" class="img-fluid" alt="Plotter Frame">
-				<p class="text-muted">Figure 1: Plotter Frame</p>
+				<img src="images/taggang-plotter.jpg" class="img-fluid" alt="Final Plotter">
+				<p class="text-muted">TagGang's Plotter on Demo Day</p>
 			</div>
-	
-			<p>Further details about the frame construction, materials used, and design considerations can be discussed here.</p>
+
+			Links to plotter items purchased from Amazon, Mouser, and STMicroelectronics:<br>
+			<a href="https://www.amazon.com/gp/product/B086PVD4XH">2x 1 inch ID x 2 inch bearings</a><br>
+			<a href="https://www.amazon.com/gp/product/B07Y33MF7R?th=1">1x 5 meter timing belt and 2x pulleys</a><br>
+			<a href="https://www.amazon.com/gp/product/B07Q6JGWNV?th=1">1x 9g servo motor</a><br>
+			<a href="https://www.mouser.com/ProductDetail/SANMOTION/SF2424-10B11?qs=l4Gc20tDgJJPaqhJYMlonw%3D%3D">2x SF2424-10B11 stepper motors</a><br>
+			<a href="https://www.st.com/en/ecosystems/x-nucleo-ihm05a1.html">2x x-nucleo-ihm05a1 stepper motor driver</a><br>
+			<a href="https://www.amazon.com/gp/product/B08C594VNP?th=1">1x power adapter</a><br>
+			<a href="https://www.raspberrypi.com/products/raspberry-pi-4-model-b/">1x raspberry pi 4</a><br>
+			Other components bought the from the stockroom or the campus bookstore included: wires, butcher paper, paint pens.<br> 
+			
 	
 			<!-- Another section with image -->
-			<h3>Stepper Motors and Belts</h3>
-			<p>Description about how stepper motors and belts are used in the plotter.</p>
-	
-			<!-- Image of stepper motors and belts -->
+			<h2>Plotter Versions</h2>
+			<p>The plotter build went through various iterations and the original build was ultimately scrapped. The original design was geared toward a width-elongated rolling frame as seen in the design:<br>
 			<div class="text-center">
-				<img src="path/to/stepper-motors.jpg" class="img-fluid" alt="Stepper Motors and Belts">
-				<p class="text-muted">Figure 2: Stepper Motors and Belts</p>
+				<img src="images/PlotterFrame.png" class="img-fluid" alt="Final Plotter">
+				<p class="text-muted">V1 plotter schematic</p>
 			</div>
-	
-			<!-- Additional content here -->
+			<div class="text-center">
+				<img src="images/PlotterPlacement.png" class="img-fluid" alt="Final Plotter">
+				<p class="text-muted">Margins and boundaries for V1 plotter</p>
+			</div>
+			
+			This first verion was constructed out of PVC pipes and the backing was either cardboard or poster foam board.<br>
+			The PVC frame was constructed but finding the backing proved to be expensive. Custom sized boards would be an additional cost we didn't want to splurge on. Trying to use recycled cardboard and poster foam boards made an uneven surface:<br>
+			<div class="text-center">
+				<img src="images/plotterv1.png" class="img-fluid" alt="Final Plotter">
+				<p class="text-muted">V1 plotter laid out</p>
+			</div>
+
+			We then received a thin whiteboard from our professor but was too flimsy and could not hold the weight of the stepper motors:<br>
+			<div class="text-center">
+				<img src="images/whiteboard.png" class="img-fluid" alt="Final Plotter">
+				<p class="text-muted">Given whiteboard for V2</p>
+			</div>
+			</p>
+
+			<h2>3D-Prints</h2>
+			<p>There were multiple versions of the 3D-prints due to the verious versions of the plotter. The working and final 3D prints can be found in our repo within <a href="https://github.com/accellarando/TagGang/tree/selector-commands/plotter-frame">selector-commands branch in plotter-frame</a>.<br>
+			Here's a preview of one print, the gondola:<br>
+			<div class="text-center">
+				<img src="images/gondola-front.png" class="img-fluid" alt="Final Plotter">
+				<p class="text-muted">gondola front</p>
+			</div>
+			<div class="text-center">
+				<img src="images/gondola-back.png" class="img-fluid" alt="Final Plotter">
+				<p class="text-muted">gondola back</p>
+			</div>
+			</p>
 	
 		</div>
 	</body>
