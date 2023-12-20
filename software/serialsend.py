@@ -39,14 +39,9 @@ def send_to_arduino(gcode_command):
     ser = serial.Serial()
     ser.baudrate = 9600
     ser.port = port
-    ser.timeout = 20 # may need to change this value
+    ser.timeout = 20 
     ser.open()
 
-    #response = ser.readline().decode().strip()
-    #response = ser.readline().decode().strip()
-    #while(len(response) != 0):
-        #print(f"Arduino Response: {response}")
-        #response = ser.readline().decode().strip()
     gcode_command = " ".join(gcode_command)
     data = (f"{gcode_command} \n").encode() # encode bytes for serial to read properly
     print(data);
@@ -65,10 +60,6 @@ def send_to_arduino(gcode_command):
     ser.close()
     return error
 
-    # (debugging) printing data:
-    # b"['G1 L217.503103 R1282.552845\\n']" >> before removing newline in parse_gcode
-    # b"['G1 L217.503103 R1282.552845']" >> before stripping
-    # b'G1 L217.503103 R1282.552845\n' >> CORRECT
 
 # initiate script with parse_args
 if __name__ == '__main__':

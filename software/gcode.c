@@ -1,11 +1,6 @@
 /**
  * This file contains code to generate G-Code from a list of points.
  *
- * TODO:
- *		- Testing
- *		- May be a good idea to check that each point is within bounds.
- *			(they should be, but just in case...)
- *
  * @author Ella Moss
  */
 
@@ -107,7 +102,7 @@ void transform_paths(GList* points, double motor_distance){
 
 static GtkWidget *gcode_label;
 
-void finish_stage() {
+static void finish_stage() {
 	gtk_widget_hide(gcode_label);
 
 	gtk_window_set_title(GTK_WINDOW(window), TITLE_PLOTTER);
@@ -115,7 +110,6 @@ void finish_stage() {
 
 void setup_gcoder() {
 	gcode_label = gtk_label_new("Generating gcode!");
-    //gtk_container_add(GTK_CONTAINER(frame), label);
 	gtk_box_pack_start(GTK_BOX(vbox), gcode_label, TRUE, TRUE, 0);
 	gtk_widget_hide(gcode_label);
 }
