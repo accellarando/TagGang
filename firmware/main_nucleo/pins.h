@@ -19,6 +19,10 @@
 #define PIN_PEN_SERVO A2
 
 // Stepper motor constants
-#define GEAR_RADIUS 8.0 //mm
-#define DEGREES_PER_STEP 1.8
-#define MM_PER_STEP ((PI * GEAR_RADIUS * DEGREES_PER_STEP) / 180.0)
+#define GEAR_RADIUS 4.0 //mm
+#define STEPS_PER_REV 200.0
+#define PULSES_PER_STEP_L 2.0
+#define PULSES_PER_STEP_R 2.0
+#define STEPS_PER_MM ( STEPS_PER_REV / (2 * PI * GEAR_RADIUS) )
+#define STEPS_R(x) (x*STEPS_PER_MM*PULSES_PER_STEP_R)
+#define STEPS_L(x) (x*STEPS_PER_MM*PULSES_PER_STEP_L)

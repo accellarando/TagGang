@@ -17,12 +17,40 @@
 #include <string.h>
 
 // Global/shared variables
-// GtkApplication *app;
+GtkApplication *app;
 GtkWidget *window;
+static GtkWidget *frame;
+GtkWidget *vbox;
+static GtkWidget *canvas_drawing_area;
 // these are declared in the header file as extern but idk if we actually want to share them?
 GFreenectDevice *kinect = NULL; 
 SkeltrackSkeleton *skeleton = NULL;
 gfloat smoothing_factor = 0.0;
+
+void on_destroy(GtkWidget *widget, gpointer data){
+	g_application_quit((GtkApplication*)data);
+}
+
+void init_frame(){
+	window = gtk_application_window_new (app);
+	gtk_window_set_title (GTK_WINDOW (window), "Draw a picture!");
+	gtk_widget_set_size_request(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+	gtk_container_set_border_width (GTK_CONTAINER (window), 8);
+	g_signal_connect (window, "destroy", G_CALLBACK (on_destroy), app);
+
+	gtk_widget_show(window);
+
+	// Create the frame
+	frame = gtk_frame_new (NULL);
+	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
+	// Add frame to window
+	gtk_container_add (GTK_CONTAINER (window), frame);
+	gtk_widget_show(frame);
+
+    // Create a vertical box to hold the drawing area and image display area
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(frame), vbox);
+}
 
 void scale_point_cloud(GtkApplication *app,
 		gpointer data){
@@ -45,15 +73,20 @@ void signal_router(GtkApplication *app,
 		activate_plotter(app, NULL, data);
 	}
 	else {
+		printf("Activating canvas by default\n");
 		activate_canvas(app, NULL, data);
 	}
 }
 
+
 void activate(GtkApplication *app,
 		gpointer data){
-	window = gtk_application_window_new (app);
-	gtk_window_set_title (GTK_WINDOW (window), "Draw a picture!");
-	gtk_widget_set_size_request(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+	init_frame();
+
+	canvas_drawing_area = setup_canvas();
+	setup_selector();
+	setup_gcoder();
+	setup_plotter();
 
 	// Route signals that the child functions emit by changing window title
 	g_signal_connect (window, "notify::title", G_CALLBACK(signal_router), app);
@@ -187,9 +220,9 @@ static void on_depth_frame (GFreenectDevice *dev, gpointer data){
 	// then, in the draw handler on drawable canvas, it will
 	// draw relevant joints and process them. this sends a new
 	// draw signal hopefully
-	if(drawing_area != NULL){
-		if(GTK_IS_WIDGET(drawing_area)){
-			gtk_widget_queue_draw(drawing_area);
+	if(canvas_drawing_area != NULL){
+		if(GTK_IS_WIDGET(canvas_drawing_area)){
+			gtk_widget_queue_draw(canvas_drawing_area);
 		}
 	}
 }
@@ -267,6 +300,11 @@ volatile int joy_y = 0;
 volatile int btn_available = 0;
 volatile struct js_event event;
 
+/***
+ * This executes every 100ms or whatebver
+ *
+ * @param data: joystick file descriptor
+ */
 gboolean check_for_js_events(gpointer data){
 	int joystick_fd = *((int*)data);
 	if(read_event(joystick_fd, &event) == 0){
@@ -312,7 +350,6 @@ gboolean check_for_js_events(gpointer data){
 int main (int    argc,
 		char **argv)
 {
-	GtkApplication *app;
 	int status;
 
 	app = gtk_application_new ("org.taggang.main", G_APPLICATION_FLAGS_NONE);
@@ -325,14 +362,14 @@ int main (int    argc,
 			NULL);
 	// Setup joystick
 	//setup_joysticks(); // This doesn't work for some reason, poll instead:
-	int joystick_fd = open("/dev/input/js0", O_RDONLY | O_NONBLOCK);
-	g_timeout_add(JOY_POLL_PERIOD, check_for_js_events, &joystick_fd);
+	
+	int joystick_fd = open("/dev/input/js0", O_RDONLY | O_NONBLOCK); // Open joystick as file descriptor
+	g_timeout_add(JOY_POLL_PERIOD, check_for_js_events, &joystick_fd); // Register joystick processing callback to run every JOY_POLL_PERIOD ms
 
 	// Set up activation signal handler
 	g_signal_connect (app, "activate", G_CALLBACK (activate), window);
 
 	status = g_application_run (G_APPLICATION (app), argc, argv);
-	gtk_main();
 
 	g_object_unref (app);
 	close(joystick_fd);

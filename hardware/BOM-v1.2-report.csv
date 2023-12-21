@@ -1,0 +1,32 @@
+"Qty","Model Number","Parts","DESCRIPTION","Price","Total Cost"
+1,"CONN_02","J4","2x1 pin header",,0
+1,"CONN_03","J1","3x1 pin header",,0
+2,"0402N150F500CT","C3, C4","SMD Ceramic Capacitor, 0402 MLCC NPO 15 pF +/- 1% 50 V",$0.10,$0.20
+2,"08055C103KAT4A","C7, C13","SMD Ceramic Capacitor, 50V .01uF X7R 0805 10%TOL",$0.10,$0.20
+2,"150060GS75000","PWR, TX","520 nm Green LED, 1608 (0603) Clear SMD package",0.15,0.3
+1,"150060RS75000","RX","LED, 0603, RED, 250MCD, 625NM",$0.15,$0.15
+4,"73L4R20J","R10, R11, R15, R16","Current Sense Resistor - SMD 0.2ohms 5%",$0.21,$0.84
+1,860020472001,"C5","4.7uF 25 VDC Aluminium Electrolytic Capacitor",$0.10,$0.10
+1,"ATMEGA328P-PU","U1","Arduino ATMEGA328P Microcontroller",$2.97,$2.97
+2,"C0402C474K9PACTU","C12, C18","SMD Comm X5R, Ceramic Capacitor, 0.47 uF, 10%, 6.3 VDC, 15.75 VDC, 0402, ",$0.10,$0.20
+1,"CAT24C32WI-GT3","IC6","EEPROM Serial-I2C 32K 4Kx8 1.8V/5V SOIC8 CAT24C32WI-GT3, 8-Pin SOIC",$0.37,$0.37
+3,"CC0402MRX5R6BB104","C1, C2, C6"," 0.1 µF ±20% 10V Ceramic Capacitor X5R 0402 (1005 Metric) ","0.12 for 10",$0.12
+1,"CC7V-T1A-16.384KHZ-12.5PF-20PPM-TA-QC","Y1"," LOW FREQUENCY CRYSTAL ",$0.71,$0.71
+7,"CL10B104KA8NNNC","C8, C9, C11, C14, C15, C17, C19","Ceramic capacitor 0603 X7R 25V 100nF (MLCC) 25 V +/-10% X7R dielectric CL","$0.14 for 10",$0.14
+3,"CRCW1206360RJNEA","R4, R5, R6","Thick Film Resistors - SMD 1/4watt 360ohms 5%",0.1,0.3
+2,"CRCW12063K90FKEA","R22, R23","Thick Film Surface Mount Resistor 1206 Case 3.9k +/-1% 0.25W",0.1,0.2
+2,"CRGCQ1206F1K0","R3, R21","SMD AEC-Q200 Compliant Thick Film Chip Resistor",0.1,0.2
+2,"DRV8825PWPR","IC4, IC5","2.5A Bipolar Stepper Motor Driver with On-Chip 1/32 Microstepping Indexer (Step/Dir Ctrl)",5.57,11.14
+1,"EGXF101ELL201MK25S","C16","Aluminum Electrolytic Capacitors - Radial Leaded 200uF 100 Volts 20%",2.41,2.41
+1,"EXB-U2H103JV","RN1","Resistor Array 8 x 10k, Power Rating (W): 1/16 W, 5%",0.41,0.41
+1,"CAT16-103J4LF","RN2","4x 10k Resistor Network",0.1,0.1
+1,"FEMALE 2x3","J5","2x3 pin header",,0
+1,"PRT-00119","J2","SparkFun Accessories DC Barrel Power Jack/Connector",1.25,1.25
+1,"PTS645SH952LFS","S1","SWITCH TACTILE SPST-NO 0.05A 12V",0.23,0.23
+1,"RASPI_BOARD_B+_HD","X1","Raspberry Pi GPIO Connector",1.94,1.94
+2,"RK73B2BTTD105J","R7, R12","Thick Film Resistors - SMD 1/4watts 1Mohms 5%",0.1,0.2
+1,"TB001-500-08BE","J3","Terminal block, screw type, 5.00 , horizontal, 8 poles, CUI Blue, slotted screw, PCB mount",1.29,1.29
+2,"TC33X-2-103G","VR3, VR4","Trimmer Resistors - SMD 3MM 10KOHMS 25% 0.1WATT",0.28,0.56
+1,"TXS0104EPWR","IC1","Voltage Level Translator, Open Drain 1.65  3.6 V, 2.3  5.5 V 14-Pin TSSOP",1.15,1.15
+2,"TXS0108EPWRG4","IC2, IC3","Voltage Level Translator, 8B Bidir Vltg-Level Translator",1.53,3.06
+,,,,"TOTAL:",30.74

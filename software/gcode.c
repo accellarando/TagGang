@@ -1,11 +1,6 @@
 /**
  * This file contains code to generate G-Code from a list of points.
  *
- * TODO:
- *		- Testing
- *		- Figure out x_scale and y_scale for scale_paths, or implement a different strategy
- *		- Loading bar? (stretch goal)
- *
  * @author Ella Moss
  */
 
@@ -59,21 +54,26 @@ void paths_to_gcode_file(GList* points, char* filename){
 	fclose(file);
 }
 
-void scale_paths(GList* points, double x_factor, double y_factor) {
+// Transform from screen width to canvas width, NO preservation of aspect ratio
+void scale_paths(GList* points) {
+	gdouble x_factor = ((gdouble)CANVAS_WIDTH) / ((gdouble) WINDOW_WIDTH);
+	gdouble y_factor = ((gdouble)CANVAS_HEIGHT) / ((gdouble)WINDOW_HEIGHT);
 	GList* current = points;
 	// First path contains the starting coordinate
 	GList *first_path = ((GList*) current->data);
-	gdouble start_x = ((DoublePoint*) (first_path->data))->x;
-	gdouble start_y = ((DoublePoint*) (first_path->data))->y;
+	gdouble start_x = ((DoublePoint*) (first_path->data))->x * x_factor;
+	gdouble start_y = ((DoublePoint*) (first_path->data))->y * y_factor;
 	current = current->next;
 
 	while (current != NULL) {
 		GList *this_path = ((GList*) current->data);
 		while(this_path != NULL){
 			DoublePoint* point = (DoublePoint*) this_path->data;
-			point->x /= x_factor;
+			point->x *= x_factor;
+			point->x /= (WINDOW_WIDTH/GRID_SIZE);
 			point->x += start_x;
-			point->y /= y_factor;
+			point->y *= y_factor;
+			point->y /= (WINDOW_HEIGHT/GRID_SIZE);
 			point->y += start_y;
 			this_path = this_path->next;
 		}
@@ -81,6 +81,9 @@ void scale_paths(GList* points, double x_factor, double y_factor) {
 	}
 }
 
+/***
+ * Transform Cartesian (x, y) pointx into stepper motor (l, r) points.
+ */
 void transform_paths(GList* points, double motor_distance){
 	GList* current = points;
 	while(current != NULL){
@@ -97,27 +100,28 @@ void transform_paths(GList* points, double motor_distance){
 	}
 }
 
-GtkWidget *label;
+static GtkWidget *gcode_label;
 
-void finish_stage() {
-	gtk_widget_destroy(label);
+static void finish_stage() {
+	gtk_widget_hide(gcode_label);
 
 	gtk_window_set_title(GTK_WINDOW(window), TITLE_PLOTTER);
 }
 
+void setup_gcoder() {
+	gcode_label = gtk_label_new("Generating gcode!");
+	gtk_box_pack_start(GTK_BOX(vbox), gcode_label, TRUE, TRUE, 0);
+	gtk_widget_hide(gcode_label);
+}
+
 void activate_gcoder(GObject* self,
 		GParamSpec* property, gpointer data) {
+	gtk_widget_show(gcode_label);
 
-	// todo: put a loading bar here that lets you keep track of progress. For now, just put some placeholder text.
-	label = gtk_label_new("Generating gcode!");
-    gtk_container_add(GTK_CONTAINER(frame), label);
-    //gtk_widget_show_all(window);
-
-	scale_paths(points_list, 10, 10);
+	scale_paths(points_list);
 
 	transform_paths(points_list, MOTOR_DISTANCE);
 
 	paths_to_gcode_file(points_list, "output.gcode");
-
 	finish_stage();
 }

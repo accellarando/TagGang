@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#define GCODE_FILE_PATH "/path/to/your/gcode_file.gcode"
+#define PYTHON_SCRIPT_PATH "/path/to/your/python_script.py"
+
+int main() {
+    FILE *gcodeFile = fopen(GCODE_FILE_PATH, "r");
+    if (gcodeFile == NULL) {
+        perror("Error opening G-code file");
+        exit(EXIT_FAILURE);
+    }
+
+    char line[256]; // Adjust buffer size as needed
+    while (fgets(line, sizeof(line), gcodeFile) != NULL) {
+        line[strcspn(line, "\n")] = '\0'; // Remove newline characters
+
+        // Send each line to the Python script
+        char command[512];
+        snprintf(command, sizeof(command), "python3 %s \"%s\"", PYTHON_SCRIPT_PATH, line);
+        FILE *pipe = popen(command, "r");
+        if (pipe == NULL) {
+            perror("Error opening pipe to Python script");
+            exit(EXIT_FAILURE);
+        }
+
+        // Read the response from the Python script (optional)
+        char response[512];
+        while (fgets(response, sizeof(response), pipe) != NULL) {
+            printf("Python response: %s", response);
+        }
+
+        pclose(pipe);
+    }
+
+    fclose(gcodeFile);
+    return 0;
+}
+
+import sys
+import serial
+
+def send_to_arduino(command):
+    ser = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=1)  # Adjust port as needed
+    data = (f"{command}\n").encode()
+    retval = ser.write(data)
+    ser.close()
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python arduino_command.py 'G1 X325.997293 Y252.657654'")
+        sys.exit(1)
+
+    gcode_command = sys.argv[1]
+    send_to_arduino(gcode_command)
+
+if __name__ == "__main__":
+    main()
