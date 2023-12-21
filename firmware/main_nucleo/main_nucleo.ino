@@ -1,8 +1,6 @@
 #include <AccelStepper.h>
 #include <MultiStepper.h>
 
-#include <Stepper.h>
-
 /*
  * Arduino code for TagGang vertical pen plotter.
  *
@@ -14,12 +12,11 @@
  * The commands are:
  *  - G1 L<pos> R<pos> : Move to position <pos>. Units tbd
  *  - G1 Z<pos> : Move pen down onto or up off the canvas, which is at 0 units
- *  - G28 : Home the motors9
+ *  - G28 : Home the motors
  *
  * TODO: 
  *  - Implement homing procedure (G28)
  *  - Bounds checking on requested coordinates (ie no negative coordinates please)
- *  	- Figure out dimensions of canvas, belt, homing position, etc
  *
  * References some source code from https://github.com/euphy/polargraph_server_a1/.
  */
@@ -80,7 +77,7 @@ int move_motors(double l, double r){
   digitalWrite(ENABLE_PIN_L, LOW);
   digitalWrite(ENABLE_PIN_R, LOW);
 
-	return 0;
+  return 0;
 }
 
 /**
@@ -110,7 +107,6 @@ int send_command(CommandType cmdType, double lz, double r){
 				return pen_up();
 			}
 			break;
-			//TODO: implement G28 (homing function)
 		case CMD_G28:
 			return move_motors(START_L, START_R);
 		default:
@@ -143,7 +139,6 @@ int exec_command(String cmd){
 					char point[10];
 					memset(point, 0, sizeof(point));
 					i = 0;
-					//Serial.println(point);
 					while(cmd[strPos] != ' ' && cmd[strPos] != '\n'){
 						point[i] = cmd[strPos];
 						strPos++;
@@ -219,25 +214,19 @@ void setup_motors(){
 /**
  * Set up motors and pins, then send OK when read
  */
+int i;
 void setup(){
 	Serial.begin(9600); // Start serial communication at 9600 baud
 	Serial.println("Loading TagGang firmware!");
 
 	setup_motors();
 
-	//Serial.println("OK");
 }
 
 void loop(){
-	if (Serial.available()){
-		String cmd = Serial.readStringUntil('\n'); // quirk: the string has to have a space before \n for some reason?
-		//Serial.print(cmd); // for debug
-	
-
+	String cmd = Serial.readStringUntil('\n'); // quirk: the string has to have a space before \n for some reason?
+	Serial.println(cmd); // for debug
 	int err = exec_command(cmd);
-	//  int err = 0;
-	//  move_motors(50+i++, 50+i++);
-	//  delay(5000);
 	if(!err){
 		Serial.println("OK");
 	}
@@ -245,6 +234,5 @@ void loop(){
 		char response[4];
 		sprintf(response, "E%03d", err);
 		Serial.println(response);
-	}
 	}
 }

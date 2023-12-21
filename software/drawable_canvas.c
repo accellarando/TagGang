@@ -48,12 +48,6 @@ static gboolean configure_event_cb (GtkWidget         *widget,
 		GdkEventConfigure *event,
 		gpointer           data)
 {
-	/*
-	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
-			gtk_widget_get_allocated_width (widget),
-			gtk_widget_get_allocated_height (widget));
-			*/
-	
 	surface = gdk_window_create_similar_surface(gtk_widget_get_window (widget),
 			CAIRO_CONTENT_COLOR,
 			gtk_widget_get_allocated_width (widget),
@@ -63,6 +57,10 @@ static gboolean configure_event_cb (GtkWidget         *widget,
 
 	/* We've handled the configure event, no need for further processing. */
 	return TRUE;
+}
+
+static void destroy_widget(GtkWidget* widget, gpointer data){
+	gtk_widget_destroy(widget);
 }
 
 static gboolean draw_cb (GtkWidget *widget,

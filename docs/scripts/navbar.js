@@ -11,14 +11,14 @@ const navElement = `
 				<a class="nav-link" href="/TagGang/schedule.html">Schedule</a>
 			</li>
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Hardware</a>
+				<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Hardware</a>
 				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/TagGang/hardware/plotter.html">Plotter</a>
 					<a class="dropdown-item" href="/TagGang/hardware/hat.html">CNC Pi HAT</a>
 				</div>
 			</li>
 			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Software</a>
+				<a class="nav-link dropdown-bs-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Software</a>
 				<div class="dropdown-menu">
 					<a class="dropdown-item" href="/TagGang/software/gui.html">GUI</a>
 					<a class="dropdown-item" href="/TagGang/software/kinect.html">Kinect UI</a>

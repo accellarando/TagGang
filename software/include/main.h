@@ -11,11 +11,17 @@
 #include <gfreenect.h>
 #include <skeltrack.h>
 
+// Kinect support
+#include <gfreenect.h>
+#include <skeltrack.h>
+
 // Window title names
 #define TITLE_CANVAS "TagGang"
 #define TITLE_SELECTOR "Place your tag"
 #define TITLE_GCODER "Confirm"
 #define TITLE_PLOTTER "Plotting!"
+
+#define MOTOR_DISTANCE 1499 //mm, ie 59"
 
 #define THRESHOLD_BEGIN 500
 #define THRESHOLD_END 1500 
@@ -67,5 +73,11 @@ typedef enum {
 	BTN_RIGHT_NONE
 } JoyButton;
 
+#define JOY_RIGHT_X 0
+#define JOY_RIGHT_Y 1
+
+#define DEADZONE 4000
+
+#define JOY_SPEED 4.0 
 
 #endif

@@ -123,6 +123,5 @@ void activate_gcoder(GObject* self,
 	transform_paths(points_list, MOTOR_DISTANCE);
 
 	paths_to_gcode_file(points_list, "output.gcode");
-
 	finish_stage();
 }

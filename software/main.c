@@ -8,11 +8,6 @@
  *
  * Kinect code in this program is based on the Skeltrack example.
  * https://github.com/joaquimrocha/Skeltrack/blob/master/examples/test-kinect.c
- *
- * TODO in main:
- *	- right now we're polling joystick values rather than having a listener
- *		(but that's a low priority - this way works)
- *		https://retropie.org.uk/docs/Nintendo-Switch-Controllers/	
  */
 #include <main.h>
 #include <fcntl.h>
@@ -56,7 +51,6 @@ void init_frame(){
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(frame), vbox);
 }
-
 
 void scale_point_cloud(GtkApplication *app,
 		gpointer data){
@@ -226,13 +220,6 @@ static void on_depth_frame (GFreenectDevice *dev, gpointer data){
 	// then, in the draw handler on drawable canvas, it will
 	// draw relevant joints and process them. this sends a new
 	// draw signal hopefully
-	/*
-	if(drawing_area != NULL){
-		if(GTK_IS_WIDGET(drawing_area)){
-			gtk_widget_queue_draw(drawing_area);
-		}
-	}
-	*/
 	if(canvas_drawing_area != NULL){
 		if(GTK_IS_WIDGET(canvas_drawing_area)){
 			gtk_widget_queue_draw(canvas_drawing_area);
@@ -381,6 +368,7 @@ int main (int    argc,
 
 	// Set up activation signal handler
 	g_signal_connect (app, "activate", G_CALLBACK (activate), window);
+
 	status = g_application_run (G_APPLICATION (app), argc, argv);
 
 	g_object_unref (app);

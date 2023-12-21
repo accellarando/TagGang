@@ -35,6 +35,7 @@ static void destroy_widget(GtkWidget* widget, gpointer data){
 
 /* Draws a selector box onto the drawing area (using Cairo API) */
 static void draw_selector(cairo_t *cr, int x, int y) {
+	printf("Drawing selector\n");
     cairo_set_source_rgba(cr, 0.0, 0.8, 0.0, 0.5); // Green 50% transparency
     cairo_rectangle(cr, x, y, GRID_SIZE, GRID_SIZE); // Create rectangle at position (x,y) w/ GRID_SIZE dimensions 
     cairo_fill(cr); // Fill rectangle with green
@@ -129,6 +130,7 @@ static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
         draw_images(cr);
     }
 
+	printf("End on_draw\n");
     return FALSE; // Indicate draw operation is complete
 }
 
@@ -136,7 +138,6 @@ static gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer data) {
 static void send_coordinates() {
     g_print("Box Coordinates: (%.0f, %.0f)\n", box_x, box_y);
 }
-
 
 static GList* point_path = NULL;
 static void save_coordinates(double x, double y) {
